@@ -13,6 +13,7 @@ const config: Config = {
           amber: "#C97B0A",
           gold: "#FFD700",
           green: "#1B4332",
+          cream: "#F5F0E8",
         },
       },
       fontFamily: {
