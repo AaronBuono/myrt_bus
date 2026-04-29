@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import ResetPasswordForm from "./ResetPasswordForm";
 
@@ -12,7 +13,9 @@ export default function ResetPasswordPage() {
             <p className="text-xs text-[#5E6470]">Staff login</p>
           </div>
         </div>
-        <ResetPasswordForm />
+        <Suspense>
+          <ResetPasswordForm />
+        </Suspense>
       </div>
     </div>
   );
