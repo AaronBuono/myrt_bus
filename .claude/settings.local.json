@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(extract-text /Users/aaronjacobbuono/projects/myrt_bus/bus-portal-requirements-final.docx)",
+      "Bash(pandoc /Users/aaronjacobbuono/projects/myrt_bus/bus-portal-requirements-final.docx -o /tmp/requirements.md)",
+      "Read(//tmp/**)",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/next/package.json'\\).version\\)\")",
+      "Bash(npm run *)",
+      "Bash(npm install *)",
+      "WebFetch(domain:neon.com)",
+      "WebSearch",
+      "Bash(npm uninstall *)",
+      "Bash(npm show *)",
+      "Bash(node -e \"const m = require\\('@neondatabase/auth/react'\\); console.log\\(Object.keys\\(m\\)\\)\")",
+      "WebFetch(domain:greenleaf.framer.website)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "WebFetch(domain:www.framer.com)",
+      "Bash(kill 69576)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(curl -s \"http://localhost:3000/_next/static/chunks/%5Broot-of-the-server%5D__0d8he~-._.css\")",
+      "Bash(xargs ls *)",
+      "Bash(xargs cat *)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}
