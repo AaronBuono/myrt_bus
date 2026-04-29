@@ -1,9 +1,10 @@
 import Image from "next/image";
+import { Suspense } from "react";
 import ResetPasswordForm from "./ResetPasswordForm";
 
 export default function ResetPasswordPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-brand-cream px-4">
+    <div className="min-h-screen flex items-center justify-center bg-white px-4">
       <div className="w-full max-w-sm space-y-5">
         <div className="flex items-center justify-center gap-3">
           <Image src="/logo-lions.png" alt="Myrtleford Lions Club" width={44} height={44} className="rounded-full border-2 border-brand-gold" />
@@ -12,7 +13,9 @@ export default function ResetPasswordPage() {
             <p className="text-xs text-[#5E6470]">Staff login</p>
           </div>
         </div>
-        <ResetPasswordForm />
+        <Suspense>
+          <ResetPasswordForm />
+        </Suspense>
       </div>
     </div>
   );
