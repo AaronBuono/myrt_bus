@@ -24,7 +24,7 @@ function HoursRow({ hour }: { hour: OpeningHour }) {
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 bg-[#EEF2FF] text-brand-blue text-sm font-semibold px-3 py-1 rounded">
+    <span className="inline-flex items-center gap-1.5 bg-slate-50 border border-[#E2E8F0] text-brand-blue text-sm font-semibold px-3 py-1 rounded">
       {day} <span className="font-normal opacity-80">{fmt12h(hour.openingTime)} – {fmt12h(hour.closingTime)}</span>
     </span>
   );
@@ -63,7 +63,7 @@ export default async function HomePage() {
               { n: 4, title: "Pay & collect keys", body: "Pay at WAW Credit Union and pick up the keys." },
             ].map(({ n, title, body }) => (
               <div key={n}>
-                <p className="text-5xl font-bold text-[#E2E8F0] leading-none mb-2 select-none">{n}</p>
+                <p aria-hidden="true" className="text-5xl font-bold text-[#E2E8F0] leading-none mb-2 select-none">{n}</p>
                 <p className="text-base font-bold text-brand-blue mb-1">{title}</p>
                 <p className="text-sm text-slate-500 leading-relaxed">{body}</p>
               </div>
@@ -105,7 +105,7 @@ export default async function HomePage() {
 
         {/* ── WAW callout ── */}
         {bank && (
-          <section className="border-l-4 border-brand-amber pl-5 py-1">
+          <section className="border-l-4 border-brand-amber pl-5 py-2">
             <p className="text-lg font-bold text-brand-blue mb-1">Keys and payment — {bank.bankName}</p>
             <p className="text-base text-slate-500 mb-4">{bank.streetAddress}</p>
             {hours.length > 0 && (
