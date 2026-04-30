@@ -84,7 +84,7 @@ export default async function HomePage() {
           <p style={{ fontFamily: "var(--font-heading)", fontSize: 11, fontWeight: 600, color: "var(--gold)", letterSpacing: "0.18em", textTransform: "uppercase", textAlign: "center", marginBottom: 10 }}>Getting started</p>
           <h2 style={{ fontFamily: "var(--font-heading)", fontSize: 32, fontWeight: 700, color: "var(--text)", textAlign: "center", marginBottom: 8 }}>How it works</h2>
           <p style={{ fontSize: 15, color: "var(--muted)", textAlign: "center", marginBottom: 44 }}>Four simple steps from booking to collecting the keys.</p>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+          <div className="grid grid-cols-2 sm:grid-cols-4" style={{ gap: 16 }}>
             {HOW_IT_WORKS.map(({ n, title, body }) => (
               <div key={n} style={{ textAlign: "center", padding: "28px 16px" }}>
                 <div style={{ width: 48, height: 48, borderRadius: "50%", background: "var(--gold-light)", border: "2px solid var(--gold)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", fontFamily: "var(--font-heading)", fontSize: 18, fontWeight: 700, color: "var(--gold)" }}>{n}</div>
@@ -97,7 +97,7 @@ export default async function HomePage() {
 
         {/* ── Pricing ── */}
         <section style={{ paddingBottom: 48 }}>
-          <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+          <div className="card" style={{ padding: 0, overflowX: "auto" }}>
             <div style={{ padding: "28px 28px 20px" }}>
               <p style={{ fontFamily: "var(--font-heading)", fontSize: 11, fontWeight: 600, color: "var(--gold)", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 8 }}>Pricing</p>
               <h2 style={{ fontFamily: "var(--font-heading)", fontSize: 24, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>Community rates</h2>
