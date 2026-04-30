@@ -63,7 +63,7 @@ export default function BookingWizard({ zones, unavailableDates, additionalDayRa
                       </svg>
                     ) : n}
                   </div>
-                  <span style={{ fontSize: 13, fontWeight: active ? 700 : 500, color: active ? "var(--navy)" : done ? "var(--muted)" : "var(--muted-light)", whiteSpace: "nowrap" }}>
+                  <span className="hidden sm:inline" style={{ fontSize: 13, fontWeight: active ? 700 : 500, color: active ? "var(--navy)" : done ? "var(--muted)" : "var(--muted-light)", whiteSpace: "nowrap" }}>
                     {label}
                   </span>
                 </div>
