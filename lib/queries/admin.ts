@@ -65,15 +65,15 @@ export async function getBookingsList(filters: {
     FROM bookings b
     LEFT JOIN booking_drivers d ON d.booking_id = b.id
     WHERE TRUE
-      AND (${status ?? null} IS NULL OR b.status::text = ${status ?? null})
-      AND (${category ?? null} IS NULL OR b.category::text = ${category ?? null})
-      AND (${search ?? null} IS NULL OR (
+      AND (${status ?? null}::text IS NULL OR b.status::text = ${status ?? null}::text)
+      AND (${category ?? null}::text IS NULL OR b.category::text = ${category ?? null}::text)
+      AND (${search ?? null}::text IS NULL OR (
             b.booker_name ILIKE ${'%' + (search ?? '') + '%'}
          OR b.reference   ILIKE ${'%' + (search ?? '') + '%'}
          OR b.booker_email ILIKE ${'%' + (search ?? '') + '%'}
       ))
-      AND (${dateFrom ?? null} IS NULL OR b.start_date >= ${dateFrom ?? null}::date)
-      AND (${dateTo ?? null} IS NULL OR b.start_date <= ${dateTo ?? null}::date)
+      AND (${dateFrom ?? null}::date IS NULL OR b.start_date >= ${dateFrom ?? null}::date)
+      AND (${dateTo ?? null}::date IS NULL OR b.start_date <= ${dateTo ?? null}::date)
     ORDER BY b.created_at DESC
     LIMIT 200
   `) as Row[];
