@@ -63,8 +63,7 @@ export async function POST(req: NextRequest) {
     const category: "a" | "c" = org?.category ?? "a";
     const isInvoicedOrg = org?.isInvoicedOrg ?? false;
     const days = selectedDates.length;
-    const amountDue =
-      category === "c" ? 0 : zone.ratePerDay + (days - 1) * additionalDayRate;
+    const amountDue = category === "c" ? 0 : zone.ratePerDay * days;
 
     const reference = await generateReference();
 

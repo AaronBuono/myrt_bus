@@ -20,17 +20,26 @@ export interface BookingResult {
 interface Props {
   zones: PricingZone[];
   unavailableDates: string[];
-  additionalDayRate: number;
   conditionsText: string;
 }
 
 const STEPS = ["Dates & Destination", "Your Details", "Confirmed"];
 
-export default function BookingWizard({ zones, unavailableDates, additionalDayRate, conditionsText }: Props) {
+export default function BookingWizard({ zones, unavailableDates, conditionsText }: Props) {
   const [step, setStep] = useState(1);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [zoneId, setZoneId] = useState<string>("");
   const [result, setResult] = useState<BookingResult | null>(null);
+
+  useEffect(() => {
+    history.replaceState({ step: 1 }, "");
+    function onPopState(e: PopStateEvent) {
+      const s = e.state?.step;
+      if (typeof s === "number") setStep(s);
+    }
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -80,17 +89,18 @@ export default function BookingWizard({ zones, unavailableDates, additionalDayRa
       <div style={{ maxWidth: step === 1 ? 900 : 680, margin: "0 auto", padding: "32px 20px 64px" }}>
         {step === 1 && (
           <Step1Dates
-            zones={zones} unavailableDates={unavailableDates} additionalDayRate={additionalDayRate}
+            zones={zones} unavailableDates={unavailableDates}
             selectedDates={selectedDates} setSelectedDates={setSelectedDates}
-            zoneId={zoneId} setZoneId={setZoneId} onNext={() => setStep(2)}
+            zoneId={zoneId} setZoneId={setZoneId}
+            onNext={() => { history.pushState({ step: 2 }, ""); setStep(2); }}
           />
         )}
         {step === 2 && (
           <Step2Details
             selectedDates={selectedDates} zoneId={zoneId} zones={zones}
-            additionalDayRate={additionalDayRate} conditionsText={conditionsText}
-            onBack={() => setStep(1)}
-            onConfirmed={(r) => { setResult(r); setStep(3); }}
+            conditionsText={conditionsText}
+            onBack={() => history.back()}
+            onConfirmed={(r) => { history.pushState({ step: 3 }, ""); setResult(r); setStep(3); }}
           />
         )}
         {step === 3 && result && <Step3Confirmed result={result} />}

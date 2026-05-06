@@ -10,6 +10,7 @@ type SearchParams = Promise<{
   search?: string;
   dateFrom?: string;
   dateTo?: string;
+  bookingId?: string;
 }>;
 
 const TABS = [
@@ -60,6 +61,7 @@ export default async function CoordinatorPage({ searchParams }: { searchParams: 
             search={params.search}
             dateFrom={params.dateFrom}
             dateTo={params.dateTo}
+            bookingId={params.bookingId}
           />
         )}
       </div>

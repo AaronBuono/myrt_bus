@@ -79,6 +79,31 @@ export async function getBookingsList(filters: {
   `) as Row[];
 }
 
+export async function getBookingDetail(id: string) {
+  const rows = (await sql`
+    SELECT
+      b.id, b.reference, b.booker_name, b.contact_person, b.contact_phone,
+      b.booker_email, b.category, b.is_invoiced_org, b.status,
+      b.zone_name, b.rate_per_day, b.additional_day_rate,
+      b.start_date, b.end_date, b.pickup_time, b.dropoff_time,
+      b.destination, b.purpose, b.passenger_count,
+      b.amount_due, b.payment_method, b.paid_at,
+      b.conditions_accepted_at, b.keys_collected_at, b.keys_returned_at,
+      b.cancelled_at, b.created_at,
+      d.full_name    AS driver_name,
+      d.mobile       AS driver_mobile,
+      d.licence_number,
+      d.licence_expiry,
+      d.home_address,
+      d.age_confirmed
+    FROM bookings b
+    LEFT JOIN booking_drivers d ON d.booking_id = b.id
+    WHERE b.id = ${id}
+    LIMIT 1
+  `) as Row[];
+  return rows[0] ?? null;
+}
+
 export async function cancelBooking(bookingId: string, cancelledByUserId: string) {
   await sql`
     UPDATE bookings

@@ -1,6 +1,7 @@
 import { getBookingsList } from "@/lib/queries/admin";
 import StatusBadge from "@/components/admin/StatusBadge";
 import CancelBookingBtn from "@/components/admin/CancelBookingBtn";
+import BookingDetailSection from "./BookingDetailSection";
 
 function fmtDate(d: unknown) {
   if (!d) return "-";
@@ -37,6 +38,7 @@ type Props = {
   dateFrom?: string;
   dateTo?: string;
   canCancel?: boolean;
+  bookingId?: string;
 };
 
 export default async function BookingsSection({
@@ -46,7 +48,12 @@ export default async function BookingsSection({
   dateFrom,
   dateTo,
   canCancel = true,
+  bookingId,
 }: Props) {
+  if (bookingId) {
+    return <BookingDetailSection bookingId={bookingId} canCancel={canCancel} />;
+  }
+
   const bookings = await getBookingsList({ status, category, search, dateFrom, dateTo });
 
   return (
@@ -139,7 +146,9 @@ export default async function BookingsSection({
               {bookings.map((b) => (
                 <tr key={b.id as string} className="hover:bg-[#F8F9FC] transition-colors">
                   <td className="px-4 py-3 font-mono text-xs font-semibold text-brand-blue whitespace-nowrap">
-                    {b.reference as string}
+                    <a href={`?section=bookings&bookingId=${b.id as string}`} className="hover:underline">
+                      {b.reference as string}
+                    </a>
                   </td>
                   <td className="px-4 py-3">
                     <p className="font-semibold">{b.booker_name as string}</p>

@@ -8,7 +8,6 @@ import { MonthGrid, MONTH_NAMES, shiftMonth, getDateRange, fmtDateShort, toISO }
 interface Props {
   zones: PricingZone[];
   unavailableDates: string[];
-  additionalDayRate: number;
   selectedDates: string[];
   setSelectedDates: (d: string[]) => void;
   zoneId: string;
@@ -17,7 +16,7 @@ interface Props {
 }
 
 export default function Step1Dates({
-  zones, unavailableDates, additionalDayRate,
+  zones, unavailableDates,
   selectedDates, setSelectedDates, zoneId, setZoneId, onNext,
 }: Props) {
   const today = new Date();
@@ -85,7 +84,7 @@ export default function Step1Dates({
   const days = selectedDates.length;
   const selectedZone = zones.find((z) => z.id === zoneId);
   const estimate = selectedZone && days > 0
-    ? selectedZone.ratePerDay + Math.max(0, days - 1) * additionalDayRate
+    ? selectedZone.ratePerDay * days
     : null;
   const canContinue = days > 0 && zoneId !== "";
   const isSingleDay = selStart !== null && selEnd !== null && selStart === selEnd;
