@@ -60,14 +60,13 @@ interface Props {
   selectedDates: string[];
   zoneId: string;
   zones: PricingZone[];
-  additionalDayRate: number;
   conditionsText: string;
   onBack: () => void;
   onConfirmed: (result: BookingResult) => void;
 }
 
 export default function Step2Details({
-  selectedDates, zoneId, zones, additionalDayRate, conditionsText, onBack, onConfirmed,
+  selectedDates, zoneId, zones, conditionsText, onBack, onConfirmed,
 }: Props) {
   const sortedDates = [...selectedDates].sort();
   const startDate = sortedDates[0];
@@ -108,7 +107,7 @@ export default function Step2Details({
         setCategoryHint("Lions Club — No Charge");
       } else {
         const days = selectedDates.length;
-        const est = zone ? zone.ratePerDay + Math.max(0, days - 1) * additionalDayRate : 0;
+        const est = zone ? zone.ratePerDay * days : 0;
         setCategoryHint(`Community Rate — $${est} due at WAW`);
       }
     } catch {

@@ -68,7 +68,11 @@ export default async function DashboardSection() {
               )}
               {recent.map((b) => (
                 <tr key={b.id as string} className="hover:bg-[#F8F9FC] transition-colors">
-                  <td className="px-4 py-3 font-mono text-xs font-semibold text-brand-blue">{b.reference as string}</td>
+                  <td className="px-4 py-3 font-mono text-xs font-semibold text-brand-blue">
+                    <a href={`?section=bookings&bookingId=${b.id as string}`} className="hover:underline">
+                      {b.reference as string}
+                    </a>
+                  </td>
                   <td className="px-4 py-3 font-medium">{b.booker_name as string}</td>
                   <td className="px-4 py-3 text-[#5E6470] hidden md:table-cell">{b.destination as string}</td>
                   <td className="px-4 py-3 text-[#5E6470] whitespace-nowrap">

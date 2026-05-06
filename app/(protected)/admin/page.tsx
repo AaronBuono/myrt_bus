@@ -17,6 +17,7 @@ type SearchParams = Promise<{
   dateTo?: string;
   editId?: string;
   create?: string;
+  bookingId?: string;
 }>;
 
 export default async function AdminPage({ searchParams }: { searchParams: SearchParams }) {
@@ -36,6 +37,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
             search={params.search}
             dateFrom={params.dateFrom}
             dateTo={params.dateTo}
+            bookingId={params.bookingId}
           />
         )}
         {section === "pricing" && <PricingSection />}

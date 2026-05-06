@@ -23,7 +23,7 @@ const DEFAULT_CONDITIONS = `1. For community use only — not for commercial or 
 18. Lions Club of Myrtleford reserves the right to refuse future bookings based on hire history.`;
 
 export default async function BookPage() {
-  const [{ zones, additionalDayRate }, unavailableDates, conditions] = await Promise.all([
+  const [{ zones }, unavailableDates, conditions] = await Promise.all([
     getPricingSnapshot(),
     getUnavailableDates(),
     getCurrentConditions(),
@@ -38,7 +38,6 @@ export default async function BookPage() {
       <BookingWizard
         zones={zones}
         unavailableDates={unavailableDates}
-        additionalDayRate={additionalDayRate}
         conditionsText={conditions?.content ?? DEFAULT_CONDITIONS}
       />
     </div>
