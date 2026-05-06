@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { AppUser } from "@/lib/auth";
+import SignOutButton from "@/components/SignOutButton";
 
 const ROLE_LABELS: Record<string, string> = {
   waw_staff: "WAW Staff",
@@ -30,11 +31,7 @@ export default function ProtectedHeader({ user }: { user: AppUser }) {
           </svg>
         </button>
         <span className="hidden sm:block text-xs text-[#5E6470]">{user.displayName}</span>
-        <form action="/api/auth/signout" method="POST">
-          <button className="text-xs text-[#5E6470] border border-[#DDE1EA] rounded-lg px-3 py-1.5 hover:border-brand-blue transition-colors">
-            Sign out
-          </button>
-        </form>
+        <SignOutButton />
       </div>
     </header>
   );
