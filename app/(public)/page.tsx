@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getHomePageData } from "@/lib/queries/home";
 import type { OpeningHour } from "@/lib/queries/home";
+import BusBanner from "@/components/BusBanner";
 
 function fmt12h(t: string | null): string {
   if (!t) return "";
@@ -44,33 +45,40 @@ export default async function HomePage() {
   return (
     <div>
       {/* ── Hero ── */}
-      <div style={{ background: "var(--navy)", padding: "72px 24px 80px", textAlign: "center" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 20, marginBottom: 36 }}>
-          <Image
-            src="/logo-lions.png"
-            alt="Myrtleford Lions Club"
-            width={72}
-            height={72}
-            style={{ borderRadius: "50%", border: "3px solid var(--gold)", flexShrink: 0 }}
-          />
-          <div style={{ width: 1, height: 48, background: "rgba(255,255,255,0.2)" }} />
-          <div style={{ background: "#fff", borderRadius: 8, padding: "6px 12px", display: "flex", alignItems: "center" }}>
-            <Image src="/logo-alpine.png" alt="Alpine Shire Council" width={125} height={30} style={{ display: "block" }} />
-          </div>
+      <div style={{ background: "var(--navy)", textAlign: "center", overflow: "hidden" }}>
+        {/* Animated banner — hidden on small screens */}
+        <div className="hidden sm:block">
+          <BusBanner />
         </div>
 
-        <p style={{ fontFamily: "var(--font-heading)", fontSize: 13, fontWeight: 500, color: "var(--gold)", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>
-          Myrtleford Lions Club
-        </p>
-        <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(36px, 6vw, 58px)", fontWeight: 700, color: "#fff", lineHeight: 1.1, marginBottom: 16 }}>
-          Community Bus
-        </h1>
-        <p style={{ fontSize: 17, color: "rgba(255,255,255,0.65)", maxWidth: 480, margin: "0 auto 40px", lineHeight: 1.7 }}>
-          Available to community groups and residents across the Alpine Shire region.
-        </p>
-        <Link href="/book" className="btn-cta btn-lg" style={{ display: "inline-block", textDecoration: "none" }}>
-          Book the Bus
-        </Link>
+        <div style={{ padding: "44px 24px 56px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 20, marginBottom: 32 }}>
+            <Image
+              src="/logo-lions.png"
+              alt="Myrtleford Lions Club"
+              width={72}
+              height={72}
+              style={{ borderRadius: "50%", border: "3px solid var(--gold)", flexShrink: 0 }}
+            />
+            <div style={{ width: 1, height: 48, background: "rgba(255,255,255,0.2)" }} />
+            <div style={{ background: "#fff", borderRadius: 8, padding: "6px 12px", display: "flex", alignItems: "center" }}>
+              <Image src="/logo-alpine.png" alt="Alpine Shire Council" width={125} height={30} style={{ display: "block" }} />
+            </div>
+          </div>
+
+          <p style={{ fontFamily: "var(--font-heading)", fontSize: 13, fontWeight: 500, color: "var(--gold)", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: 12 }}>
+            Myrtleford Lions Club
+          </p>
+          <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(36px, 6vw, 58px)", fontWeight: 700, color: "#fff", lineHeight: 1.1, marginBottom: 16 }}>
+            Community Bus
+          </h1>
+          <p style={{ fontSize: 17, color: "rgba(255,255,255,0.65)", maxWidth: 480, margin: "0 auto 36px", lineHeight: 1.7 }}>
+            Available to community groups and residents across the Alpine Shire region.
+          </p>
+          <Link href="/book" className="btn-cta btn-lg" style={{ display: "inline-block", textDecoration: "none" }}>
+            Book the Bus
+          </Link>
+        </div>
       </div>
 
       <div style={{ maxWidth: 820, margin: "0 auto", padding: "0 20px" }}>
