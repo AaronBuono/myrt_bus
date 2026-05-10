@@ -1,15 +1,12 @@
-import { getPricingZones, getSystemSettings } from "@/lib/queries/admin";
-import { updateZoneRateAction, updateAdditionalDayRateAction } from "@/app/actions/admin";
+import { getPricingZones } from "@/lib/queries/admin";
+import { updateZoneRateAction } from "@/app/actions/admin";
 
 function fmtAUD(n: number) {
   return new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(n);
 }
 
 export default async function PricingSection() {
-  const [zones, settings] = await Promise.all([
-    getPricingZones(),
-    getSystemSettings(),
-  ]);
+  const zones = await getPricingZones();
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -46,29 +43,6 @@ export default async function PricingSection() {
         </div>
       </div>
 
-      <div className="card">
-        <h2 className="text-base font-bold text-brand-blue mb-1">Additional Day Rate</h2>
-        <p className="text-sm text-[#5E6470] mb-4">
-          Flat fee charged for each day after the first day of a multi-day booking.
-        </p>
-        <form action={updateAdditionalDayRateAction} className="flex items-center gap-3">
-          <span className="text-sm text-[#5E6470]">$</span>
-          <input
-            type="number"
-            name="rate"
-            step="0.01"
-            min="0"
-            defaultValue={Number(settings?.additional_day_rate ?? 0).toFixed(2)}
-            className="form-input w-32 text-right font-semibold"
-            required
-          />
-          <button type="submit" className="btn-primary text-xs px-3 py-2">
-            Save
-          </button>
-          <span className="text-sm text-[#5E6470]">per extra day</span>
-        </form>
-      </div>
-
       <div className="card bg-[#EEF2FF] border-brand-blue/20">
         <h3 className="text-sm font-bold text-brand-blue mb-2">Current Rates Summary</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -78,10 +52,6 @@ export default async function PricingSection() {
               <span className="font-semibold">{fmtAUD(Number(zone.rate_per_day))}/day</span>
             </div>
           ))}
-          <div className="flex justify-between text-sm">
-            <span className="text-[#5E6470]">Extra day</span>
-            <span className="font-semibold">{fmtAUD(Number(settings?.additional_day_rate ?? 0))}/day</span>
-          </div>
         </div>
       </div>
     </div>

@@ -6,7 +6,6 @@ import { requireRole } from "@/lib/auth";
 import {
   cancelBooking,
   updateZoneRate,
-  updateAdditionalDayRate,
   publishNewConditions,
   updateSystemSettings,
   updateBankRecord,
@@ -16,10 +15,12 @@ import {
   setUserActive,
   updateStaffUser,
   createStaffUser,
+  getStaffUserById,
 } from "@/lib/queries/admin";
+import { sendStaffInvite } from "@/lib/email";
 
 export async function cancelBookingAction(formData: FormData) {
-  const user = await requireRole("lions_admin", "bus_coordinator");
+  const user = await requireRole("admin");
   const id = formData.get("bookingId") as string;
   if (!id) return;
   await cancelBooking(id, user.id);
@@ -28,7 +29,7 @@ export async function cancelBookingAction(formData: FormData) {
 }
 
 export async function updateZoneRateAction(formData: FormData) {
-  const user = await requireRole("lions_admin");
+  const user = await requireRole("admin");
   const zoneId = formData.get("zoneId") as string;
   const rate = parseFloat(formData.get("rate") as string);
   if (!zoneId || isNaN(rate) || rate < 0) return;
@@ -36,16 +37,8 @@ export async function updateZoneRateAction(formData: FormData) {
   revalidatePath("/admin");
 }
 
-export async function updateAdditionalDayRateAction(formData: FormData) {
-  await requireRole("lions_admin");
-  const rate = parseFloat(formData.get("rate") as string);
-  if (isNaN(rate) || rate < 0) return;
-  await updateAdditionalDayRate(rate);
-  revalidatePath("/admin");
-}
-
 export async function publishConditionsAction(formData: FormData) {
-  const user = await requireRole("lions_admin");
+  const user = await requireRole("admin");
   const content = (formData.get("content") as string)?.trim();
   if (!content) return;
   await publishNewConditions(content, user.id);
@@ -53,7 +46,7 @@ export async function publishConditionsAction(formData: FormData) {
 }
 
 export async function updateSystemSettingsAction(formData: FormData) {
-  await requireRole("lions_admin");
+  await requireRole("admin");
   await updateSystemSettings({
     registeredName: (formData.get("registered_name") as string) || undefined,
     registrationNumber: (formData.get("registration_number") as string) || undefined,
@@ -68,7 +61,7 @@ export async function updateSystemSettingsAction(formData: FormData) {
 }
 
 export async function updateBankAction(formData: FormData) {
-  await requireRole("lions_admin");
+  await requireRole("admin");
   const bankId = formData.get("bankId") as string;
   if (!bankId) return;
   await updateBankRecord(bankId, {
@@ -83,7 +76,7 @@ export async function updateBankAction(formData: FormData) {
 }
 
 export async function updateOpeningHourAction(formData: FormData) {
-  await requireRole("lions_admin");
+  await requireRole("admin");
   const bankId = formData.get("bankId") as string;
   const dayOfWeek = parseInt(formData.get("day_of_week") as string);
   const isOpen = formData.get("is_open") === "true";
@@ -96,7 +89,7 @@ export async function updateOpeningHourAction(formData: FormData) {
 }
 
 export async function upsertOrgAction(formData: FormData) {
-  await requireRole("lions_admin");
+  await requireRole("admin");
   const id = (formData.get("id") as string) || undefined;
   await upsertOrganisation({
     id,
@@ -116,7 +109,7 @@ export async function upsertOrgAction(formData: FormData) {
 }
 
 export async function deleteOrgAction(formData: FormData) {
-  await requireRole("lions_admin");
+  await requireRole("admin");
   const id = formData.get("id") as string;
   if (!id) return;
   await deleteOrganisation(id);
@@ -124,7 +117,7 @@ export async function deleteOrgAction(formData: FormData) {
 }
 
 export async function toggleUserActiveAction(formData: FormData) {
-  await requireRole("lions_admin");
+  await requireRole("admin");
   const userId = formData.get("userId") as string;
   const isActive = formData.get("isActive") === "true";
   if (!userId) return;
@@ -133,7 +126,7 @@ export async function toggleUserActiveAction(formData: FormData) {
 }
 
 export async function updateStaffUserAction(formData: FormData) {
-  await requireRole("lions_admin");
+  await requireRole("admin");
   const userId = formData.get("userId") as string;
   if (!userId) return;
   await updateStaffUser(userId, {
@@ -145,12 +138,33 @@ export async function updateStaffUserAction(formData: FormData) {
 }
 
 export async function createStaffUserAction(formData: FormData) {
-  await requireRole("lions_admin");
-  await createStaffUser({
-    neonAuthUserId: (formData.get("neon_auth_user_id") as string) || null,
-    displayName: formData.get("display_name") as string,
-    email: formData.get("email") as string,
-    role: formData.get("role") as string,
-  });
+  await requireRole("admin");
+  const email = formData.get("email") as string;
+  const displayName = formData.get("display_name") as string;
+  const role = formData.get("role") as string;
+  const sendInvite = formData.get("send_invite") === "true";
+
+  await createStaffUser({ neonAuthUserId: null, displayName, email, role });
+
+  if (sendInvite) {
+    const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://myrtlefordcommunitybus.com.au"}/login`;
+    await sendStaffInvite({ to: email, name: displayName, loginUrl }).catch(console.error);
+  }
+
   redirect("/admin?section=staff");
+}
+
+export async function sendStaffInviteAction(formData: FormData) {
+  await requireRole("admin");
+  const userId = formData.get("userId") as string;
+  if (!userId) return;
+  const user = await getStaffUserById(userId);
+  if (!user) return;
+  const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://myrtlefordcommunitybus.com.au"}/login`;
+  await sendStaffInvite({
+    to: user.email as string,
+    name: user.display_name as string,
+    loginUrl,
+  });
+  revalidatePath("/admin");
 }

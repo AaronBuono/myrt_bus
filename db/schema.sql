@@ -7,7 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- ── Enums ────────────────────────────────────────────────────
 
-CREATE TYPE user_role AS ENUM ('waw_staff', 'bus_coordinator', 'lions_admin');
+CREATE TYPE user_role AS ENUM ('admin', 'lions_staff', 'bus_coordinator', 'waw_staff');
 CREATE TYPE booking_category AS ENUM ('a', 'c');
 CREATE TYPE booking_status AS ENUM ('confirmed', 'in_use', 'pending_inspection', 'complete', 'cancelled');
 CREATE TYPE payment_method AS ENUM ('cash', 'card', 'eft');

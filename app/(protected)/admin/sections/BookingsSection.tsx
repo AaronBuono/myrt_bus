@@ -2,6 +2,7 @@ import { getBookingsList } from "@/lib/queries/admin";
 import StatusBadge from "@/components/admin/StatusBadge";
 import CancelBookingBtn from "@/components/admin/CancelBookingBtn";
 import BookingDetailSection from "./BookingDetailSection";
+import ClickableRow from "@/components/admin/ClickableRow";
 
 function fmtDate(d: unknown) {
   if (!d) return "-";
@@ -144,11 +145,9 @@ export default async function BookingsSection({
                 </tr>
               )}
               {bookings.map((b) => (
-                <tr key={b.id as string} className="hover:bg-[#F8F9FC] transition-colors">
+                <ClickableRow key={b.id as string} href={`?section=bookings&bookingId=${b.id as string}`} className="hover:bg-[#F8F9FC] transition-colors">
                   <td className="px-4 py-3 font-mono text-xs font-semibold text-brand-blue whitespace-nowrap">
-                    <a href={`?section=bookings&bookingId=${b.id as string}`} className="hover:underline">
-                      {b.reference as string}
-                    </a>
+                    {b.reference as string}
                   </td>
                   <td className="px-4 py-3">
                     <p className="font-semibold">{b.booker_name as string}</p>
@@ -191,7 +190,7 @@ export default async function BookingsSection({
                       )}
                     </td>
                   )}
-                </tr>
+                </ClickableRow>
               ))}
             </tbody>
           </table>

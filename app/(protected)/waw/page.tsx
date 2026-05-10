@@ -27,7 +27,7 @@ function fmtTime(t: unknown) {
 }
 
 export default async function WAWPage() {
-  await requireRole("waw_staff");
+  await requireRole("admin");
 
   const [bankData, upcoming] = await Promise.all([
     getActiveBankWithHours(),

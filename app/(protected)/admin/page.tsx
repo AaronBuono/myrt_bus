@@ -21,7 +21,7 @@ type SearchParams = Promise<{
 }>;
 
 export default async function AdminPage({ searchParams }: { searchParams: SearchParams }) {
-  await requireRole("lions_admin");
+  await requireRole("admin");
   const params = await searchParams;
   const section = (params.section ?? "dashboard") as AdminSection;
 

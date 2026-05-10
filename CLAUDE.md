@@ -32,7 +32,7 @@ No test runner is configured yet.
 - `app/api/` — API routes: `POST /api/bookings`, `GET /api/bookings/lookup`, Neon Auth proxy at `/api/auth/[...path]`
 - Auth-related pages (no group): `/login`, `/reset-password`, `/unauthorized`
 
-`/dashboard` is not a real page — it redirects to the role-appropriate destination (`/admin`, `/waw`, or `/coordinator`).
+`/dashboard` is not a real page — it redirects to the role-appropriate destination (`/admin` for `admin`, `/coordinator` for all other roles).
 
 The protected role pages are fully built. Each has tab-based navigation driven by `?section=` URL search params — all rendering is server-side, no client state for navigation.
 
@@ -41,9 +41,15 @@ The protected role pages are fully built. Each has tab-based navigation driven b
 [middleware.ts](middleware.ts) uses `neonAuthMiddleware` to redirect unauthenticated requests on protected routes to `/login`. Inside protected pages, [lib/auth.ts](lib/auth.ts) exposes `getUser()` and `requireRole(...roles)`. Roles are stored in the `users` table with a `neon_auth_user_id` foreign key linking to Neon Auth's managed `neon_auth.users_sync` table.
 
 Role → page access:
-- `waw_staff` → `/waw`
-- `bus_coordinator` → `/coordinator`
-- `lions_admin` → `/admin`
+- `admin` → `/admin` — full access: bookings (with cancel), pricing, conditions, orgs, staff management, settings, bank details
+- `lions_staff` → `/coordinator` — read-only: dashboard + bookings list
+- `bus_coordinator` → `/coordinator` — read-only: dashboard + bookings list
+- `waw_staff` → `/coordinator` — read-only: dashboard + bookings list
+
+Permission boundaries:
+- All write operations (cancel booking, update pricing, publish conditions, manage orgs/staff/settings/bank) require `admin`
+- `/waw` (bank/payment details page) is `admin`-only
+- Only `admin` can add, edit, or deactivate staff and assign roles
 
 Public bookers have **no accounts** — the booking reference number (format `BK-YYYY-NNN`) is their only identifier.
 
@@ -72,23 +78,24 @@ Transactions use the manual `sql\`BEGIN\`` / `sql\`COMMIT\`` / `sql\`ROLLBACK\``
 
 All staff mutations live in [app/actions/admin.ts](app/actions/admin.ts) as Next.js Server Actions — they call `requireRole()` internally, then the relevant query, then `revalidatePath`.
 
-**`/admin`** (`lions_admin`) — 7-tab portal. Each tab is a server component under [app/(protected)/admin/sections/](app/(protected)/admin/sections/):
-- `DashboardSection` — stat cards + recent bookings
-- `BookingsSection` — filterable table with cancel; filter state lives in URL params so the filter form uses `method="GET"` with a hidden `name="section"` input to preserve the tab
-- `PricingSection` — per-zone rate + additional day rate, one form per zone
+**`/admin`** (`admin`) — 7-tab portal. Each tab is a server component under [app/(protected)/admin/sections/](app/(protected)/admin/sections/):
+- `DashboardSection` — stat cards + recent bookings (rows are clickable, navigate to booking detail)
+- `BookingsSection` — filterable table with cancel; rows are clickable; filter state lives in URL params so the filter form uses `method="GET"` with a hidden `name="section"` input to preserve the tab
+- `PricingSection` — per-zone rate, one form per zone
 - `ConditionsSection` — publish new version (textarea → server action), collapsible version history via `<details>`
 - `OrgsSection` — address book CRUD; edit/create state uses `?editId=` / `?create=1` URL params so the form and table coexist on the same server-rendered page
-- `StaffSection` — same URL-param pattern as orgs; toggle active uses a plain form POST
+- `StaffSection` — same URL-param pattern as orgs; toggle active uses a plain form POST; role options: `admin`, `lions_staff`, `bus_coordinator`, `waw_staff`
 - `SettingsSection` — org settings, bank details, per-day opening hours (one form per row)
 
-**`/coordinator`** (`bus_coordinator`) — Dashboard + Bookings tabs only; reuses the same section components from the admin folder.
+**`/coordinator`** (`lions_staff`, `bus_coordinator`, `waw_staff`) — Dashboard + Bookings tabs, read-only (no cancel button); reuses the same section components from the admin folder.
 
-**`/waw`** (`waw_staff`) — Single page (no tabs): payment/bank details, currently-in-use indicator, upcoming confirmed bookings awaiting payment.
+**`/waw`** (`admin`) — Single page (no tabs): payment/bank details, currently-in-use indicator, upcoming confirmed bookings awaiting payment. Admin-only.
 
 **Shared admin components** in [components/admin/](components/admin/):
 - `AdminNav.tsx` — tab link list; receives current section as prop, no client JS
 - `StatusBadge.tsx` — maps booking status strings to coloured badge classes
-- `CancelBookingBtn.tsx` — the only client component in the admin portal; uses `useTransition` + `window.confirm`
+- `CancelBookingBtn.tsx` — client component; uses `useTransition` + `window.confirm`
+- `ClickableRow.tsx` — client component; wraps a `<tr>` with router navigation on click, skipping clicks on buttons/links/forms
 
 **Neon null parameter gotcha:** when filtering with optional parameters in tagged-template SQL, always cast nullable params explicitly (e.g. `${value ?? null}::text`) — bare `null` causes a "could not determine data type" error because PostgreSQL can't infer the type of an untyped `$N` parameter.
 

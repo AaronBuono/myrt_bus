@@ -24,7 +24,27 @@
       "Bash(git init *)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(npx next *)",
+      "Bash(npx eslint *)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(git push *)",
+      "Bash(git -C /Users/aaronjacobbuono/projects/myrt_bus status --short)",
+      "Bash(cp /Users/aaronjacobbuono/projects/myrt_bus/app/favicon.ico/favicon.ico /tmp/favicon.ico)",
+      "Bash(cp /Users/aaronjacobbuono/projects/myrt_bus/app/favicon.ico/apple-touch-icon.png /tmp/apple-touch-icon.png)",
+      "Bash(cp /Users/aaronjacobbuono/projects/myrt_bus/app/favicon.ico/android-chrome-192x192.png /tmp/android-chrome-192x192.png)",
+      "Bash(cp /Users/aaronjacobbuono/projects/myrt_bus/app/favicon.ico/android-chrome-512x512.png /tmp/android-chrome-512x512.png)",
+      "Bash(cp /Users/aaronjacobbuono/projects/myrt_bus/app/favicon.ico/favicon-16x16.png /tmp/favicon-16x16.png)",
+      "Bash(git -C /Users/aaronjacobbuono/projects/myrt_bus add app/favicon.ico app/apple-icon.png public/android-chrome-192x192.png public/android-chrome-512x512.png public/favicon-16x16.png public/favicon-32x32.png public/site.webmanifest)",
+      "Bash(git -C /Users/aaronjacobbuono/projects/myrt_bus commit -m ' *)",
+      "Bash(git -C /Users/aaronjacobbuono/projects/myrt_bus push)",
+      "Bash(git -C /Users/aaronjacobbuono/projects/myrt_bus log main..feat/mobile-responsive-header --oneline)",
+      "Bash(gh pr create --title 'feat: mobile responsive header, admin portal, and favicon' --body ' *)",
+      "Bash(gh pr create --title 'fix: back navigation, estimate calculation, and booking detail view' --body ' *)",
+      "Bash(/Users/aaronjacobbuono/projects/myrt_bus/node_modules/.bin/next lint *)",
+      "Bash(./node_modules/.bin/next lint *)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(sips -g pixelWidth -g pixelHeight /Users/aaronjacobbuono/projects/myrt_bus/public/logo-alpine.png)"
     ]
   }
 }

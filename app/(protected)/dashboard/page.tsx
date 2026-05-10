@@ -8,9 +8,10 @@ export default async function DashboardPage() {
   if (!user) redirect("/login");
 
   switch (user.role) {
-    case "lions_admin":    redirect("/admin");
-    case "waw_staff":      redirect("/waw");
-    case "bus_coordinator": redirect("/coordinator");
+    case "admin":          redirect("/admin");
+    case "lions_staff":
+    case "bus_coordinator":
+    case "waw_staff":      redirect("/coordinator");
     default:               redirect("/unauthorized");
   }
 }

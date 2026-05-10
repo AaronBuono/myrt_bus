@@ -318,6 +318,16 @@ export async function getStaffUsers() {
   `) as Row[];
 }
 
+export async function getStaffUserById(userId: string) {
+  const rows = (await sql`
+    SELECT id, display_name, email, role
+    FROM users
+    WHERE id = ${userId}
+    LIMIT 1
+  `) as Row[];
+  return rows[0] ?? null;
+}
+
 export async function createStaffUser(data: {
   neonAuthUserId: string | null;
   displayName: string;
