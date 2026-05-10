@@ -13,7 +13,7 @@ export default function PublicHeader() {
         <Link href="/" className="flex items-center gap-2 sm:gap-3 min-w-0">
           <Image src="/logo-lions.png" alt="Myrtleford Lions Club" width={34} height={34} className="rounded-full flex-shrink-0" />
           <div className="w-px h-6 bg-[#DDE1EA] flex-shrink-0" />
-          <Image src="/logo-alpine.png" alt="Alpine Shire Council" width={26} height={26} className="rounded-full flex-shrink-0" />
+          <Image src="/logo-alpine.png" alt="Alpine Shire Council" width={88} height={21} className="flex-shrink-0" />
           <span className="text-sm font-bold text-brand-blue ml-1 hidden sm:block">Community Bus</span>
         </Link>
 

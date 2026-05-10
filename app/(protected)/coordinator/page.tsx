@@ -21,7 +21,7 @@ const TABS = [
 type CoordSection = (typeof TABS)[number]["key"];
 
 export default async function CoordinatorPage({ searchParams }: { searchParams: SearchParams }) {
-  await requireRole("bus_coordinator");
+  await requireRole("bus_coordinator", "waw_staff", "lions_staff");
   const params = await searchParams;
   const section = (params.section ?? "dashboard") as CoordSection;
 
@@ -62,6 +62,7 @@ export default async function CoordinatorPage({ searchParams }: { searchParams: 
             dateFrom={params.dateFrom}
             dateTo={params.dateTo}
             bookingId={params.bookingId}
+            canCancel={false}
           />
         )}
       </div>

@@ -54,12 +54,8 @@ export default async function HomePage() {
             style={{ borderRadius: "50%", border: "3px solid var(--gold)", flexShrink: 0 }}
           />
           <div style={{ width: 1, height: 48, background: "rgba(255,255,255,0.2)" }} />
-          <div style={{ background: "#fff", borderRadius: 10, padding: "8px 14px", display: "flex", alignItems: "center", gap: 10 }}>
-            <Image src="/logo-alpine.png" alt="Alpine Shire Council" width={36} height={36} style={{ borderRadius: "50%" }} />
-            <div style={{ textAlign: "left" }}>
-              <p style={{ fontSize: 12, fontWeight: 800, color: "var(--text)", letterSpacing: "0.06em" }}>ALPINE</p>
-              <p style={{ fontSize: 9, color: "var(--muted)", letterSpacing: "0.15em", textTransform: "uppercase" }}>Shire Council</p>
-            </div>
+          <div style={{ background: "#fff", borderRadius: 8, padding: "6px 12px", display: "flex", alignItems: "center" }}>
+            <Image src="/logo-alpine.png" alt="Alpine Shire Council" width={125} height={30} style={{ display: "block" }} />
           </div>
         </div>
 

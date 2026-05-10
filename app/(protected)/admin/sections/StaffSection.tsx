@@ -1,9 +1,10 @@
 import { getStaffUsers } from "@/lib/queries/admin";
-import { toggleUserActiveAction, updateStaffUserAction, createStaffUserAction } from "@/app/actions/admin";
+import { toggleUserActiveAction, updateStaffUserAction, createStaffUserAction, sendStaffInviteAction } from "@/app/actions/admin";
 import Link from "next/link";
 
 const ROLE_LABELS: Record<string, string> = {
-  lions_admin: "Lions Admin",
+  admin: "Admin",
+  lions_staff: "Lions Staff",
   bus_coordinator: "Bus Coordinator",
   waw_staff: "WAW Staff",
 };
@@ -63,23 +64,31 @@ export default async function StaffSection({ editId, create }: Props) {
             <div>
               <label className="form-label">Role *</label>
               <select name="role" required defaultValue={editing?.role as string ?? "bus_coordinator"} className="form-input">
-                <option value="lions_admin">Lions Admin</option>
+                <option value="admin">Admin</option>
+                <option value="lions_staff">Lions Staff</option>
                 <option value="bus_coordinator">Bus Coordinator</option>
                 <option value="waw_staff">WAW Staff</option>
               </select>
             </div>
 
             {!editing && (
-              <div>
-                <label className="form-label">Neon Auth User ID</label>
+              <div className="flex items-start gap-3 p-3 bg-[#F8F9FC] rounded-lg">
                 <input
-                  name="neon_auth_user_id"
-                  className="form-input font-mono text-xs"
-                  placeholder="Leave blank to fill in later after they sign up"
+                  type="checkbox"
+                  id="send_invite_checkbox"
+                  name="send_invite"
+                  value="true"
+                  className="mt-1 h-4 w-4 accent-brand-blue"
+                  defaultChecked
                 />
-                <p className="text-xs text-[#5E6470] mt-1">
-                  This links the portal account to their OAuth login. You can set it after they&apos;ve signed up via the login page.
-                </p>
+                <div>
+                  <label htmlFor="send_invite_checkbox" className="text-sm font-semibold text-brand-blue cursor-pointer">
+                    Send invite email
+                  </label>
+                  <p className="text-xs text-[#5E6470] mt-0.5">
+                    Emails the staff member a link to the login page. They sign up with this email and access is granted automatically.
+                  </p>
+                </div>
               </div>
             )}
 
@@ -132,7 +141,7 @@ export default async function StaffSection({ editId, create }: Props) {
                   </td>
                   <td className="px-4 py-3">
                     <span className={
-                      u.role === "lions_admin" ? "badge-blue" :
+                      u.role === "admin" ? "badge-blue" :
                       u.role === "bus_coordinator" ? "badge-amber" : "badge-green"
                     }>
                       {ROLE_LABELS[u.role as string] ?? u.role as string}
@@ -156,6 +165,17 @@ export default async function StaffSection({ editId, create }: Props) {
                       >
                         Edit
                       </Link>
+                      {!u.last_login_at && (
+                        <form action={sendStaffInviteAction}>
+                          <input type="hidden" name="userId" value={u.id as string} />
+                          <button
+                            type="submit"
+                            className="text-xs font-semibold text-amber-600 hover:text-amber-800"
+                          >
+                            Resend Invite
+                          </button>
+                        </form>
+                      )}
                       <form action={toggleUserActiveAction}>
                         <input type="hidden" name="userId" value={u.id as string} />
                         <input type="hidden" name="isActive" value={u.is_active ? "false" : "true"} />
@@ -182,7 +202,10 @@ export default async function StaffSection({ editId, create }: Props) {
       <div className="card bg-[#EEF2FF] border-brand-blue/20">
         <h3 className="text-sm font-bold text-brand-blue mb-2">How staff login works</h3>
         <p className="text-sm text-[#5E6470]">
-          Staff sign in via the login page using OAuth (Google / email link). The first time they sign in, their Neon Auth User ID gets linked to their staff record here. Until that link exists, they can sign in but will see the &ldquo;Unauthorised&rdquo; page.
+          Add the staff member here and send them an invite email. They click the link, go to the login page, and sign up (or sign in) using the same email address. Their account links automatically on first login — no manual ID copying needed.
+        </p>
+        <p className="text-sm text-[#5E6470] mt-2">
+          If a staff member hasn&apos;t logged in yet, use &ldquo;Resend Invite&rdquo; to send another email. If they already have an existing account with the same email, they just need to sign in.
         </p>
       </div>
     </div>
