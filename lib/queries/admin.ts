@@ -320,7 +320,7 @@ export async function getStaffUsers() {
 
 export async function getStaffUserById(userId: string) {
   const rows = (await sql`
-    SELECT id, display_name, email, role
+    SELECT id, neon_auth_user_id, display_name, email, role
     FROM users
     WHERE id = ${userId}
     LIMIT 1

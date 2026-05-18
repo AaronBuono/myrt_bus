@@ -138,6 +138,9 @@ export default async function StaffSection({ editId, create }: Props) {
                   <td className="px-4 py-3">
                     <p className="font-semibold">{u.display_name as string}</p>
                     <p className="text-xs text-[#5E6470]">{u.email as string}</p>
+                    {!u.neon_auth_user_id && (
+                      <p className="text-xs text-amber-600 mt-0.5">No auth account yet</p>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <span className={
@@ -202,10 +205,10 @@ export default async function StaffSection({ editId, create }: Props) {
       <div className="card bg-[#EEF2FF] border-brand-blue/20">
         <h3 className="text-sm font-bold text-brand-blue mb-2">How staff login works</h3>
         <p className="text-sm text-[#5E6470]">
-          Add the staff member here and send them an invite email. They click the link, go to the login page, and sign up (or sign in) using the same email address. Their account links automatically on first login — no manual ID copying needed.
+          When you add a staff member, their login account is created automatically and they receive a &ldquo;Set your password&rdquo; email. They click the link, choose a password, and are signed in — no manual steps in the Neon dashboard needed.
         </p>
         <p className="text-sm text-[#5E6470] mt-2">
-          If a staff member hasn&apos;t logged in yet, use &ldquo;Resend Invite&rdquo; to send another email. If they already have an existing account with the same email, they just need to sign in.
+          If an account shows &ldquo;No auth account yet&rdquo;, automatic creation failed. To fix this: go to the Neon Console → Auth → Users → find your account → ⋯ → &ldquo;Make admin&rdquo;, then resend the invite. As a fallback, staff can still sign up themselves at the login page.
         </p>
       </div>
     </div>

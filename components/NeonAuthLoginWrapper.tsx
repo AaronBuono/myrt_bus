@@ -7,6 +7,6 @@ const NeonAuthLogin = dynamic(
   { ssr: false, loading: () => <div className="h-32 animate-pulse bg-[#F0F1F4] rounded-xl" /> }
 );
 
-export default function NeonAuthLoginWrapper() {
-  return <NeonAuthLogin />;
+export default function NeonAuthLoginWrapper({ initialMode }: { initialMode?: "signin" | "signup" }) {
+  return <NeonAuthLogin initialMode={initialMode} />;
 }

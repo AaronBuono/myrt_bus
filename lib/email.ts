@@ -18,16 +18,18 @@ export async function sendStaffInvite({
   const fromAddress =
     process.env.EMAIL_FROM ?? "noreply@myrtlefordcommunitybus.com.au";
 
+  const signupUrl = `${loginUrl}?mode=signup`;
+
   await resend.emails.send({
     from: fromAddress,
     to,
-    subject: "You've been added to the Myrtleford Lions Club Bus Portal",
+    subject: "You've been invited to the Myrtleford Lions Club Bus Portal",
     html: `
       <p>Hi ${name},</p>
-      <p>You've been added as a staff member on the Myrtleford Lions Club Community Bus Portal.</p>
-      <p>To get started, visit the login page and sign up (or sign in) using this email address: <strong>${to}</strong></p>
-      <p><a href="${loginUrl}" style="display:inline-block;padding:10px 20px;background:#002868;color:#fff;text-decoration:none;border-radius:4px;">Go to Login Page</a></p>
-      <p>If you already have an account with this email, just log in — your access will be granted automatically.</p>
+      <p>You've been invited as a staff member on the Myrtleford Lions Club Community Bus Portal.</p>
+      <p>Click the button below to create your account using this email address: <strong>${to}</strong></p>
+      <p><a href="${signupUrl}" style="display:inline-block;padding:10px 20px;background:#002868;color:#fff;text-decoration:none;border-radius:4px;">Create your account</a></p>
+      <p>If you already have an account with this email, <a href="${loginUrl}">sign in here</a> and your access will be granted automatically.</p>
       <p>Myrtleford Lions Club Community Bus</p>
     `,
   });

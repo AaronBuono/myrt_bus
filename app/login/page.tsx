@@ -1,7 +1,14 @@
 import Image from "next/image";
 import NeonAuthLoginWrapper from "@/components/NeonAuthLoginWrapper";
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ mode?: string }>;
+}) {
+  const { mode } = await searchParams;
+  const initialMode = mode === "signup" ? "signup" : "signin";
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F5F6F8] px-4">
       <div className="w-full max-w-sm space-y-5">
@@ -12,7 +19,7 @@ export default function LoginPage() {
             <p className="text-xs text-[#5E6470]">Staff login</p>
           </div>
         </div>
-        <NeonAuthLoginWrapper />
+        <NeonAuthLoginWrapper initialMode={initialMode} />
       </div>
     </div>
   );
