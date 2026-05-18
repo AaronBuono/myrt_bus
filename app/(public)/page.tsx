@@ -58,7 +58,7 @@ export default async function HomePage() {
               alt="Myrtleford Lions Club"
               width={72}
               height={72}
-              style={{ borderRadius: "50%", border: "3px solid var(--gold)", flexShrink: 0 }}
+              style={{ flexShrink: 0 }}
             />
             <div style={{ width: 1, height: 48, background: "rgba(255,255,255,0.2)" }} />
             <div style={{ background: "#fff", borderRadius: 8, padding: "6px 12px", display: "flex", alignItems: "center" }}>
