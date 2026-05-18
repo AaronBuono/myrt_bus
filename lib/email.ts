@@ -10,29 +10,47 @@ export async function sendStaffInvite({
   to,
   name,
   loginUrl,
+  authAccountExists = false,
 }: {
   to: string;
   name: string;
   loginUrl: string;
+  authAccountExists?: boolean;
 }) {
   const fromAddress =
     process.env.EMAIL_FROM ?? "noreply@myrtlefordcommunitybus.com.au";
 
-  const signupUrl = `${loginUrl}?mode=signup`;
-
-  await resend.emails.send({
-    from: fromAddress,
-    to,
-    subject: "You've been invited to the Myrtleford Lions Club Bus Portal",
-    html: `
-      <p>Hi ${name},</p>
-      <p>You've been invited as a staff member on the Myrtleford Lions Club Community Bus Portal.</p>
-      <p>Click the button below to create your account using this email address: <strong>${to}</strong></p>
-      <p><a href="${signupUrl}" style="display:inline-block;padding:10px 20px;background:#002868;color:#fff;text-decoration:none;border-radius:4px;">Create your account</a></p>
-      <p>If you already have an account with this email, <a href="${loginUrl}">sign in here</a> and your access will be granted automatically.</p>
-      <p>Myrtleford Lions Club Community Bus</p>
-    `,
-  });
+  if (authAccountExists) {
+    // Account already created server-side — direct them to reset/set their password.
+    await resend.emails.send({
+      from: fromAddress,
+      to,
+      subject: "Your account is ready — set your password",
+      html: `
+        <p>Hi ${name},</p>
+        <p>You've been added as a staff member on the Myrtleford Lions Club Community Bus Portal.</p>
+        <p>Your login account has been created using this email address: <strong>${to}</strong></p>
+        <p>To get started, visit the login page and click <strong>Forgot password?</strong> to set your own password.</p>
+        <p><a href="${loginUrl}" style="display:inline-block;padding:10px 20px;background:#002868;color:#fff;text-decoration:none;border-radius:4px;">Go to Login</a></p>
+        <p>Myrtleford Lions Club Community Bus</p>
+      `,
+    });
+  } else {
+    // No auth account yet — direct them to self-register.
+    const signupUrl = `${loginUrl}?mode=signup`;
+    await resend.emails.send({
+      from: fromAddress,
+      to,
+      subject: "You've been invited to the Myrtleford Lions Club Bus Portal",
+      html: `
+        <p>Hi ${name},</p>
+        <p>You've been invited as a staff member on the Myrtleford Lions Club Community Bus Portal.</p>
+        <p>Click the button below to create your account using this email address: <strong>${to}</strong></p>
+        <p><a href="${signupUrl}" style="display:inline-block;padding:10px 20px;background:#002868;color:#fff;text-decoration:none;border-radius:4px;">Create your account</a></p>
+        <p>Myrtleford Lions Club Community Bus</p>
+      `,
+    });
+  }
 }
 
 export async function sendBookingConfirmation({

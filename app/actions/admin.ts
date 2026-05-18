@@ -153,14 +153,12 @@ export async function createStaffUserAction(formData: FormData) {
   if (sendInvite) {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://myrtlefordcommunitybus.com.au";
     const loginUrl = `${appUrl}/login`;
-
-    if (neonAuthUserId) {
-      // Auth account created — send Neon Auth password-reset as the invite link.
-      await sendNeonAuthPasswordReset(email, appUrl);
-    } else {
-      // Auth creation failed — send a Resend invite directing them to sign up.
-      await sendStaffInvite({ to: email, name: displayName, loginUrl }).catch(console.error);
-    }
+    await sendStaffInvite({
+      to: email,
+      name: displayName,
+      loginUrl,
+      authAccountExists: !!neonAuthUserId,
+    }).catch(console.error);
   }
 
   redirect("/admin?section=staff");
@@ -175,16 +173,11 @@ export async function sendStaffInviteAction(formData: FormData) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://myrtlefordcommunitybus.com.au";
   const loginUrl = `${appUrl}/login`;
 
-  if (user.neon_auth_user_id) {
-    // Auth account already exists — resend as a password-reset link.
-    await sendNeonAuthPasswordReset(user.email as string, appUrl);
-  } else {
-    // No auth account yet — resend sign-up invite.
-    await sendStaffInvite({
-      to: user.email as string,
-      name: user.display_name as string,
-      loginUrl,
-    });
-  }
+  await sendStaffInvite({
+    to: user.email as string,
+    name: user.display_name as string,
+    loginUrl,
+    authAccountExists: !!user.neon_auth_user_id,
+  });
   revalidatePath("/admin");
 }

@@ -73,7 +73,7 @@ export function NeonAuthLogin({ initialMode }: { initialMode?: "signin" | "signu
     setError("");
     setLoading(true);
     try {
-      await (authClient as any).requestPasswordReset({
+      await authClient.requestPasswordReset({
         email: resetEmail,
         redirectTo: `${window.location.origin}/reset-password`,
       });
