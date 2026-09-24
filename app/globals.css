@@ -55,11 +55,37 @@
   .form-input {
     @apply w-full border border-[#DDE1EA] rounded-lg px-3 py-2.5 text-sm text-[#1A1A1A] bg-white focus:outline-none focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/10 transition-colors;
   }
+  /* Public forms: larger text for older users; 16px inputs also stop iOS zooming on focus */
+  .field-label {
+    @apply block text-[15px] font-semibold text-[#1A1A1A] mb-1.5;
+  }
+  .field-hint {
+    @apply text-sm text-[#5E6470] -mt-0.5 mb-1.5;
+  }
+  .field-error {
+    @apply text-sm font-semibold text-red-700 mt-1.5;
+  }
+  .form-input-lg {
+    @apply text-base py-3 disabled:bg-[#F5F6F8] disabled:text-[#5E6470];
+  }
+  .form-input[aria-invalid="true"] {
+    @apply border-red-500 ring-2 ring-red-500/10;
+  }
   .form-checkbox {
-    @apply w-4 h-4 accent-brand-blue flex-shrink-0;
+    @apply w-5 h-5 mt-0.5 accent-brand-blue flex-shrink-0;
   }
   .checkbox-label {
     @apply flex items-start gap-3 cursor-pointer text-sm text-[#1A1A1A];
+  }
+  /* Counter (day view) — sized for thumbs on a phone */
+  .counter-check {
+    @apply flex items-start gap-3 cursor-pointer text-base text-[#1A1A1A] rounded-lg border border-[#DDE1EA] bg-white px-3 py-3;
+  }
+  .counter-choice {
+    @apply flex items-center justify-center gap-2 cursor-pointer text-base font-semibold rounded-lg border-2 border-[#DDE1EA] bg-white px-3 py-3 has-[:checked]:border-brand-blue has-[:checked]:bg-[#EEF2FF];
+  }
+  .counter-ok {
+    @apply text-base font-bold text-green-800 bg-green-50 border border-green-200 rounded-lg px-4 py-3;
   }
   .section-header {
     @apply border-l-4 border-brand-blue pl-3 mb-4;
@@ -148,12 +174,42 @@
   }
 }
 
-/* Pricing table examples column — hidden on mobile */
-.pricing-examples-col {
-  display: none;
+/* Home page */
+.home-hero {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 48px 20px 56px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: center;
 }
-@media (min-width: 640px) {
-  .pricing-examples-col {
-    display: table-cell;
+.home-hero-art {
+  width: 100%;
+  max-width: 440px;
+  height: auto;
+  justify-self: center;
+  border-radius: 16px;
+}
+.home-steps {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+.home-contact {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+@media (min-width: 768px) {
+  .home-hero {
+    grid-template-columns: 1.1fr 1fr;
+    padding: 72px 24px 80px;
+  }
+  .home-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .home-contact {
+    grid-template-columns: 1fr 1fr;
   }
 }

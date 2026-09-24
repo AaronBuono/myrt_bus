@@ -15,7 +15,8 @@ function fmtAUD(n: number) {
   return new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(n);
 }
 
-const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+// day_of_week: 0 = Monday … 6 = Sunday (see db/schema.sql)
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 function fmtTime(t: unknown) {
   if (!t) return "";
@@ -34,11 +35,12 @@ export default async function WAWPage() {
     getBookingsList({ status: "confirmed" }),
   ]);
 
-  const inUse = await getBookingsList({ status: "in_use" });
+  const inUse = await getBookingsList({ status: "picked_up" });
   const bank = bankData?.bank;
   const hours = bankData?.hours ?? [];
 
-  const today = new Date().getDay();
+  // JS getDay(): 0 = Sunday; convert to 0 = Monday, in Melbourne time
+  const today = (new Date(new Date().toLocaleString("en-US", { timeZone: "Australia/Melbourne" })).getDay() + 6) % 7;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-6">

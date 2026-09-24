@@ -2,6 +2,7 @@ import Link from "next/link";
 
 const TABS = [
   { key: "dashboard", label: "Dashboard" },
+  { key: "day", label: "Today" },
   { key: "bookings", label: "Bookings" },
   { key: "pricing", label: "Pricing" },
   { key: "conditions", label: "Conditions" },

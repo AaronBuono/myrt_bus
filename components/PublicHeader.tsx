@@ -14,12 +14,12 @@ export default function PublicHeader() {
           <Image src="/logo-lions.png" alt="Myrtleford Lions Club" width={34} height={34} className="rounded-full flex-shrink-0" />
           <div className="w-px h-6 bg-[#DDE1EA] flex-shrink-0" />
           <Image src="/logo-alpine.png" alt="Alpine Shire Council" width={88} height={21} className="flex-shrink-0" />
-          <span className="text-sm font-bold text-brand-blue ml-1 hidden sm:block">Community Bus</span>
+          <span className="text-sm font-bold text-brand-blue ml-1 hidden sm:block">Alpine Community Bus</span>
         </Link>
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-2 flex-shrink-0">
-          <Link href="/book" className="btn-cta text-xs py-1.5 px-3">Book the Bus</Link>
+          <Link href="/book" className="btn-cta text-xs py-1.5 px-3">Book the bus</Link>
           <Link href="/login" className="text-xs text-[#5E6470] border border-[#DDE1EA] rounded-lg px-3 py-1.5 hover:border-brand-blue transition-colors">
             Login
           </Link>
@@ -52,7 +52,7 @@ export default function PublicHeader() {
             className="btn-cta text-sm px-4 py-2.5 text-center"
             onClick={() => setMenuOpen(false)}
           >
-            Book the Bus
+            Book the bus
           </Link>
           <Link
             href="/login"

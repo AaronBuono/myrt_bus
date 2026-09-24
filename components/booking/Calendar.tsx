@@ -9,8 +9,10 @@ export const MONTH_NAMES = [
 
 const DAY_LABELS = ["Mo","Tu","We","Th","Fr","Sa","Su"];
 
+// Local calendar date as "YYYY-MM-DD". (toISOString() would give the UTC date, which is
+// the previous day for most of the morning in Melbourne.)
 export function toISO(d: Date): string {
-  return d.toISOString().slice(0, 10);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 function daysInMonth(year: number, month: number): number {
@@ -142,6 +144,9 @@ export function MonthGrid({
                 }} />
               )}
               <button
+                type="button"
+                aria-label={`${fmtDateLong(iso)}${isUnavailable ? " (unavailable)" : ""}`}
+                aria-pressed={hasCircle}
                 disabled={disabled}
                 onClick={() => !disabled && onDateClick(iso)}
                 onMouseEnter={() => !disabled && onDateHover(iso)}

@@ -7,17 +7,24 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:push": "export $(grep -v '^#' .env.local | xargs) && psql $DATABASE_URL -f db/schema.sql"
+    "test": "node --import ./tests/register.mjs --test tests/*.test.ts",
+    "db:push": "export $(grep -v '^#' .env.local | xargs) && psql $DATABASE_URL -v ON_ERROR_STOP=1 -f db/schema.sql",
+    "db:migrate": "export $(grep -v '^#' .env.local | xargs) && psql $DATABASE_URL -v ON_ERROR_STOP=1 -f",
+    "db:seed": "export $(grep -v '^#' .env.local | xargs) && psql $DATABASE_URL -v ON_ERROR_STOP=1 -f db/seed.sql"
   },
   "dependencies": {
     "@neondatabase/auth": "^0.1.0-beta.21",
     "@neondatabase/serverless": "^0.10.4",
+    "@vercel/blob": "^2.8.0",
+    "motion": "^13.4.2",
     "next": "^16.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "resend": "^4.2.0"
+    "resend": "^4.2.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

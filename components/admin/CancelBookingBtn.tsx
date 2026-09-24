@@ -8,7 +8,7 @@ export default function CancelBookingBtn({ bookingId }: { bookingId: string }) {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!confirm("Cancel this booking? This cannot be undone.")) return;
+    if (!confirm("Cancel this booking? The customer will be emailed. This cannot be undone.")) return;
     const form = e.currentTarget;
     startTransition(() => {
       cancelBookingAction(new FormData(form));

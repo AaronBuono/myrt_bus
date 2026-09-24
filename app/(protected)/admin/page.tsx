@@ -1,4 +1,5 @@
 import { requireRole } from "@/lib/auth";
+import DaySection from "./sections/DaySection";
 import AdminNav, { type AdminSection } from "@/components/admin/AdminNav";
 import DashboardSection from "./sections/DashboardSection";
 import BookingsSection from "./sections/BookingsSection";
@@ -18,6 +19,8 @@ type SearchParams = Promise<{
   editId?: string;
   create?: string;
   bookingId?: string;
+  date?: string;
+  modify?: string;
 }>;
 
 export default async function AdminPage({ searchParams }: { searchParams: SearchParams }) {
@@ -29,7 +32,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
     <>
       <AdminNav section={section} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        {section === "dashboard" && <DashboardSection />}
+        {section === "dashboard" && <DashboardSection basePath="/admin" />}
+        {section === "day" && <DaySection date={params.date} showPii canAct basePath="/admin" />}
         {section === "bookings" && (
           <BookingsSection
             status={params.status}
@@ -38,6 +42,8 @@ export default async function AdminPage({ searchParams }: { searchParams: Search
             dateFrom={params.dateFrom}
             dateTo={params.dateTo}
             bookingId={params.bookingId}
+            modify={params.modify === "1"}
+            viewer={{ canManage: true, showPii: true, basePath: "/admin" }}
           />
         )}
         {section === "pricing" && <PricingSection />}

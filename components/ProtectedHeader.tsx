@@ -3,9 +3,10 @@ import type { AppUser } from "@/lib/auth";
 import SignOutButton from "@/components/SignOutButton";
 
 const ROLE_LABELS: Record<string, string> = {
+  admin: "Admin",
+  lions_staff: "Lions Staff",
   waw_staff: "WAW Staff",
   bus_coordinator: "Bus Coordinator",
-  lions_admin: "Lions Admin",
 };
 
 export default function ProtectedHeader({ user }: { user: AppUser }) {
@@ -16,7 +17,7 @@ export default function ProtectedHeader({ user }: { user: AppUser }) {
           <span className="text-brand-gold font-black text-sm">L</span>
         </div>
         <div className="w-px h-6 bg-[#DDE1EA] flex-shrink-0" />
-        <span className="text-sm font-bold text-brand-blue hidden sm:block">Community Bus</span>
+        <span className="text-sm font-bold text-brand-blue hidden sm:block">Alpine Community Bus</span>
         <span className="badge-blue ml-1 hidden sm:inline-flex">{ROLE_LABELS[user.role] ?? user.role}</span>
         <span className="badge-blue ml-1 sm:hidden text-xs">{ROLE_LABELS[user.role]?.split(" ")[0] ?? user.role}</span>
       </div>

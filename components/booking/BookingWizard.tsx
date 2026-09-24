@@ -13,19 +13,28 @@ export interface BookingResult {
   isInvoicedOrg: boolean;
   startDate: string;
   endDate: string;
+  pickupTime: string;
+  returnTime: string;
   destination: string;
   zoneName: string;
+  contactEmail: string;
+}
+
+export interface ConditionsInfo {
+  id: string | null;
+  version: number | null;
+  content: string;
 }
 
 interface Props {
   zones: PricingZone[];
   unavailableDates: string[];
-  conditionsText: string;
+  conditions: ConditionsInfo;
 }
 
 const STEPS = ["Dates & Destination", "Your Details", "Confirmed"];
 
-export default function BookingWizard({ zones, unavailableDates, conditionsText }: Props) {
+export default function BookingWizard({ zones, unavailableDates, conditions }: Props) {
   const [step, setStep] = useState(1);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [zoneId, setZoneId] = useState<string>("");
@@ -72,7 +81,7 @@ export default function BookingWizard({ zones, unavailableDates, conditionsText 
                       </svg>
                     ) : n}
                   </div>
-                  <span className="hidden sm:inline" style={{ fontSize: 13, fontWeight: active ? 700 : 500, color: active ? "var(--navy)" : done ? "var(--muted)" : "var(--muted-light)", whiteSpace: "nowrap" }}>
+                  <span className="hidden sm:inline" style={{ fontSize: 14, fontWeight: active ? 700 : 500, color: active ? "var(--navy)" : done ? "var(--muted)" : "var(--muted-light)", whiteSpace: "nowrap" }}>
                     {label}
                   </span>
                 </div>
@@ -98,7 +107,7 @@ export default function BookingWizard({ zones, unavailableDates, conditionsText 
         {step === 2 && (
           <Step2Details
             selectedDates={selectedDates} zoneId={zoneId} zones={zones}
-            conditionsText={conditionsText}
+            initialConditions={conditions}
             onBack={() => history.back()}
             onConfirmed={(r) => { history.pushState({ step: 3 }, ""); setResult(r); setStep(3); }}
           />

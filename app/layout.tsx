@@ -1,13 +1,29 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
+import MotionProvider from "@/components/MotionProvider";
+import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
 
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans" });
 
 export const metadata: Metadata = {
-  title: "Myrtleford Lions Club — Community Bus",
-  description:
-    "Book the Myrtleford Lions Club community bus. Available to groups and residents across the Alpine Shire region.",
+  metadataBase: new URL(SITE_URL),
+  title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
+  description: SITE_DESCRIPTION,
+  applicationName: SITE_NAME,
+  manifest: "/site.webmanifest",
+  openGraph: {
+    type: "website",
+    locale: "en_AU",
+    url: "/",
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#002868",
 };
 
 export default function RootLayout({
@@ -16,8 +32,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={dmSans.variable}>
-      <body>{children}</body>
+    <html lang="en-AU" className={dmSans.variable}>
+      <body>
+        <MotionProvider>{children}</MotionProvider>
+      </body>
     </html>
   );
 }

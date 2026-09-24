@@ -1,7 +1,11 @@
 export const dynamic = "force-dynamic";
 
+import type { Metadata } from "next";
+
 import { getPricingSnapshot, getUnavailableDates, getCurrentConditions } from "@/lib/queries/booking";
 import BookingWizard from "@/components/booking/BookingWizard";
+
+export const metadata: Metadata = { title: "Book the bus" };
 
 const DEFAULT_CONDITIONS = `1. For community use only — not for commercial or profit-making purposes.
 2. Maximum 12 passengers including the driver at all times.
@@ -32,13 +36,17 @@ export default async function BookPage() {
   return (
     <div>
       <div className="bg-brand-blue px-6 py-8 text-center">
-        <h1 className="text-2xl font-bold text-white mb-1">Book the Bus</h1>
-        <p className="text-white/70 text-sm">Select your dates, fill in your details, and get a booking reference instantly.</p>
+        <h1 className="text-3xl font-bold text-white mb-1">Book the bus</h1>
+        <p className="text-white/80 text-base">Choose your dates, fill in your details, and get a booking reference straight away.</p>
       </div>
       <BookingWizard
         zones={zones}
         unavailableDates={unavailableDates}
-        conditionsText={conditions?.content ?? DEFAULT_CONDITIONS}
+        conditions={
+          conditions
+            ? { id: conditions.id, version: conditions.version, content: conditions.content }
+            : { id: null, version: null, content: DEFAULT_CONDITIONS }
+        }
       />
     </div>
   );

@@ -9,9 +9,9 @@ export default async function DashboardPage() {
 
   switch (user.role) {
     case "admin":          redirect("/admin");
+    case "waw_staff":      redirect("/coordinator?section=day");
     case "lions_staff":
-    case "bus_coordinator":
-    case "waw_staff":      redirect("/coordinator");
+    case "bus_coordinator": redirect("/coordinator");
     default:               redirect("/unauthorized");
   }
 }

@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { lookupOrganisation, getPricingSnapshot } from "@/lib/queries/booking";
+import { lookupOrganisation } from "@/lib/queries/booking";
+import { rateLimit, clientKey } from "@/lib/rate-limit";
 
 export async function GET(req: NextRequest) {
-  const name = req.nextUrl.searchParams.get("name") ?? "";
-  if (!name) return NextResponse.json({ category: "a" });
+  if (!(await rateLimit(`lookup:${clientKey(req.headers)}`, 30, 60))) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
 
-  const [org, { zones, additionalDayRate }] = await Promise.all([
-    lookupOrganisation(name),
-    getPricingSnapshot(),
-  ]);
+  const name = (req.nextUrl.searchParams.get("name") ?? "").slice(0, 200);
+  if (!name.trim()) return NextResponse.json({ category: "a" });
 
+  const org = await lookupOrganisation(name);
   if (!org) return NextResponse.json({ category: "a" }, { status: 404 });
 
-  // Return category and a placeholder estimate (zone unknown at this point)
   return NextResponse.json({ category: org.category, isInvoicedOrg: org.isInvoicedOrg });
 }
