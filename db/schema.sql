@@ -1,15 +1,16 @@
 -- ============================================================
--- Myrtleford Lions Club — Community Bus Booking Portal
--- Database Schema
+-- Alpine Community Bus — Booking Portal
+-- Database Schema (fresh install). Existing databases: apply db/migrations/ in order.
 -- ============================================================
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+CREATE EXTENSION IF NOT EXISTS btree_gist;
 
 -- ── Enums ────────────────────────────────────────────────────
 
 CREATE TYPE user_role AS ENUM ('admin', 'lions_staff', 'bus_coordinator', 'waw_staff');
 CREATE TYPE booking_category AS ENUM ('a', 'c');
-CREATE TYPE booking_status AS ENUM ('confirmed', 'in_use', 'pending_inspection', 'complete', 'cancelled');
+CREATE TYPE booking_status AS ENUM ('confirmed', 'picked_up', 'returned', 'cancelled');
 CREATE TYPE payment_method AS ENUM ('cash', 'card', 'eft');
 CREATE TYPE flag_type AS ENUM ('empty_tank', 'late_return', 'returned_dirty', 'damage', 'other');
 CREATE TYPE invoicing_frequency AS ENUM ('monthly', 'quarterly');
@@ -111,12 +112,14 @@ CREATE TABLE pricing_history (
 
 CREATE TABLE bookings (
   id                          UUID              PRIMARY KEY DEFAULT gen_random_uuid(),
-  reference                   TEXT              NOT NULL UNIQUE,  -- BK-YYYY-NNN
+  reference                   TEXT              NOT NULL UNIQUE,  -- ACB-XXXXXX (legacy: BK-YYYY-NNN)
   organisation_id             UUID              REFERENCES organisations(id),
-  booker_name                 TEXT              NOT NULL,
+  organisation_name           TEXT,                                -- as typed by the booker; NULL = individual
+  booker_name                 TEXT              NOT NULL,          -- display name: organisation, else contact name
   contact_person              TEXT              NOT NULL,
-  contact_phone               TEXT              NOT NULL,
+  contact_phone               TEXT              NOT NULL,          -- E.164, e.g. +61412345678
   booker_email                TEXT              NOT NULL,
+  contact_address             TEXT,
   category                    booking_category  NOT NULL,
   is_invoiced_org             BOOLEAN           NOT NULL DEFAULT FALSE,
   status                      booking_status    NOT NULL DEFAULT 'confirmed',
@@ -124,24 +127,51 @@ CREATE TABLE bookings (
   zone_name                   TEXT              NOT NULL,          -- snapshot
   rate_per_day                NUMERIC(10,2)     NOT NULL,          -- snapshot at confirmation
   additional_day_rate         NUMERIC(10,2)     NOT NULL,          -- snapshot at confirmation
-  start_date                  DATE              NOT NULL,
-  end_date                    DATE              NOT NULL,
+  start_date                  DATE              NOT NULL,          -- Melbourne-local copy of pickup_at
+  end_date                    DATE              NOT NULL,          -- Melbourne-local copy of return_at
   pickup_time                 TIME              NOT NULL,
   dropoff_time                TIME              NOT NULL,
+  pickup_at                   TIMESTAMPTZ       NOT NULL,          -- source of truth for the hire period (UTC)
+  return_at                   TIMESTAMPTZ       NOT NULL,
   destination                 TEXT              NOT NULL,
-  purpose                     TEXT,
-  passenger_count             INT               CHECK (passenger_count BETWEEN 1 AND 12),
+  purpose                     TEXT,                                -- no longer collected; kept for historic rows
+  passenger_count             INT               CHECK (passenger_count BETWEEN 1 AND 12),  -- ditto
   amount_due                  NUMERIC(10,2)     NOT NULL,
   conditions_version_id       UUID              REFERENCES conditions_of_use(id),
   conditions_accepted_at      TIMESTAMPTZ       NOT NULL,
+  manage_token_hash           TEXT              UNIQUE,            -- SHA-256 of the manage-link token
+  replaces_booking_id         UUID              REFERENCES bookings(id),
   payment_method              payment_method,
   paid_at                     TIMESTAMPTZ,
   paid_recorded_by_user_id    UUID              REFERENCES users(id),
+  -- Pickup (counter)
   keys_collected_at           TIMESTAMPTZ,
+  licence_sighted             BOOLEAN,
+  key_handed_over             BOOLEAN,
+  odometer_out                INT               CHECK (odometer_out >= 0),
+  picked_up_by_user_id        UUID              REFERENCES users(id),
+  -- Return (counter)
   keys_returned_at            TIMESTAMPTZ,
+  odometer_in                 INT               CHECK (odometer_in >= 0),
+  fuel_full                   BOOLEAN,
+  bus_cleaned                 BOOLEAN,
+  damage_notes                TEXT,
+  damage_photo_url            TEXT,
+  returned_by_user_id         UUID              REFERENCES users(id),
+  -- Cancellation
   cancelled_at                TIMESTAMPTZ,
   cancelled_by_user_id        UUID              REFERENCES users(id),
-  created_at                  TIMESTAMPTZ       NOT NULL DEFAULT NOW()
+  cancellation_reason         TEXT,
+  created_at                  TIMESTAMPTZ       NOT NULL DEFAULT NOW(),
+
+  CONSTRAINT bookings_period_valid   CHECK (return_at > pickup_at),
+  CONSTRAINT bookings_odometer_order CHECK (odometer_in IS NULL OR odometer_out IS NULL OR odometer_in >= odometer_out),
+  -- One bus: no two active bookings may overlap. DEFERRABLE so a date change can
+  -- cancel the old row and insert the new one in a single statement.
+  CONSTRAINT bookings_no_overlap
+    EXCLUDE USING gist (tstzrange(pickup_at, return_at, '[)') WITH &&)
+    WHERE (status IN ('confirmed', 'picked_up'))
+    DEFERRABLE INITIALLY IMMEDIATE
 );
 
 CREATE INDEX idx_bookings_status       ON bookings(status);
@@ -149,6 +179,8 @@ CREATE INDEX idx_bookings_start_date   ON bookings(start_date);
 CREATE INDEX idx_bookings_end_date     ON bookings(end_date);
 CREATE INDEX idx_bookings_org          ON bookings(organisation_id);
 CREATE INDEX idx_bookings_email        ON bookings(booker_email);
+CREATE INDEX idx_bookings_pickup_at    ON bookings(pickup_at);
+CREATE INDEX idx_bookings_return_at    ON bookings(return_at);
 
 CREATE TABLE booking_drivers (
   id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -156,6 +188,7 @@ CREATE TABLE booking_drivers (
   full_name       TEXT        NOT NULL,
   mobile          TEXT        NOT NULL,
   licence_number  TEXT        NOT NULL,
+  licence_state   TEXT        CHECK (licence_state IN ('VIC','ACT','NSW','NT','QLD','SA','TAS','WA','NZ')),
   licence_expiry  DATE        NOT NULL,
   home_address    TEXT        NOT NULL,
   age_confirmed   BOOLEAN     NOT NULL DEFAULT FALSE
@@ -369,10 +402,56 @@ CREATE TABLE system_settings (
   postal_address        TEXT,
   treasurer_name        TEXT,
   treasurer_mobile      TEXT,
-  email_from_address    TEXT           NOT NULL DEFAULT 'noreply@myrtlefordcommunitybus.com.au',
+  email_from_address    TEXT           NOT NULL DEFAULT 'noreply@alpinecommunitybus.com.au',
   email_reply_to        TEXT,
   additional_day_rate   NUMERIC(10,2)  NOT NULL DEFAULT 68.00,
+  self_cancel_cutoff_hours INT         NOT NULL DEFAULT 0 CHECK (self_cancel_cutoff_hours >= 0),
+  admin_notify_email    TEXT,
   updated_at            TIMESTAMPTZ    NOT NULL DEFAULT NOW()
+);
+
+-- ── Audit log ────────────────────────────────────────────────
+
+CREATE TABLE audit_log (
+  id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  entity_type     TEXT        NOT NULL,          -- booking, pricing_zone, conditions, organisation, user, settings, bank, opening_hours
+  entity_id       TEXT,
+  booking_id      UUID        REFERENCES bookings(id) ON DELETE SET NULL,
+  action          TEXT        NOT NULL,          -- created, cancelled, dates_changed, picked_up, returned, updated, ...
+  actor_user_id   UUID        REFERENCES users(id),
+  actor_label     TEXT        NOT NULL,          -- staff display name, or 'Customer' / 'System'
+  details         JSONB       NOT NULL DEFAULT '{}'::jsonb,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_audit_log_booking    ON audit_log(booking_id, created_at DESC);
+CREATE INDEX idx_audit_log_created_at ON audit_log(created_at DESC);
+
+-- ── Email log (fed by the Resend webhook) ────────────────────
+
+CREATE TABLE email_log (
+  id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  booking_id       UUID        REFERENCES bookings(id) ON DELETE SET NULL,
+  kind             TEXT        NOT NULL,         -- booking_confirmation, booking_cancelled, admin_cancel_notice, staff_invite
+  to_address       TEXT        NOT NULL,
+  subject          TEXT        NOT NULL,
+  resend_email_id  TEXT        UNIQUE,
+  status           TEXT        NOT NULL DEFAULT 'sent',  -- sent, delivered, delivery_delayed, bounced, complained, failed
+  error            TEXT,
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_email_log_booking ON email_log(booking_id);
+CREATE INDEX idx_email_log_problem ON email_log(created_at DESC) WHERE status IN ('bounced', 'complained', 'failed');
+
+-- ── Rate limiting (fixed-window counters) ────────────────────
+
+CREATE TABLE rate_limits (
+  key           TEXT        NOT NULL,
+  window_start  TIMESTAMPTZ NOT NULL,
+  count         INT         NOT NULL DEFAULT 0,
+  PRIMARY KEY (key, window_start)
 );
 
 -- ── Seed data ────────────────────────────────────────────────
@@ -386,19 +465,19 @@ INSERT INTO pricing_zones (zone_name, examples, rate_per_day, display_order) VAL
   ('Far Destinations',   'Mornington Peninsula, Surf Coast, Philip Island, Canberra',    311.00, 6);
 
 INSERT INTO system_settings (email_from_address, additional_day_rate)
-  VALUES ('noreply@myrtlefordcommunitybus.com.au', 68.00);
+  VALUES ('noreply@alpinecommunitybus.com.au', 68.00);
 
 INSERT INTO bank_records (bank_name, street_address, phone, bsb, account_number, is_active)
   VALUES ('WAW Credit Union', '27 Clyde St, Myrtleford VIC 3737', '', '', '', TRUE);
 
 INSERT INTO opening_hours (bank_record_id, day_of_week, is_open, opening_time, closing_time)
-  SELECT id, 0, TRUE,  '09:00', '17:00' FROM bank_records WHERE is_active = TRUE UNION ALL
-  SELECT id, 1, TRUE,  '09:00', '17:00' FROM bank_records WHERE is_active = TRUE UNION ALL
-  SELECT id, 2, TRUE,  '09:00', '17:00' FROM bank_records WHERE is_active = TRUE UNION ALL
-  SELECT id, 3, TRUE,  '09:00', '17:00' FROM bank_records WHERE is_active = TRUE UNION ALL
-  SELECT id, 4, TRUE,  '09:00', '17:00' FROM bank_records WHERE is_active = TRUE UNION ALL
-  SELECT id, 5, TRUE,  '09:00', '12:00' FROM bank_records WHERE is_active = TRUE UNION ALL
-  SELECT id, 6, FALSE, NULL,    NULL     FROM bank_records WHERE is_active = TRUE;
+  SELECT id, 0, TRUE,  '09:00'::time, '17:00'::time FROM bank_records WHERE is_active = TRUE UNION ALL
+  SELECT id, 1, TRUE,  '09:00'::time, '17:00'::time FROM bank_records WHERE is_active = TRUE UNION ALL
+  SELECT id, 2, TRUE,  '09:00'::time, '17:00'::time FROM bank_records WHERE is_active = TRUE UNION ALL
+  SELECT id, 3, TRUE,  '09:00'::time, '17:00'::time FROM bank_records WHERE is_active = TRUE UNION ALL
+  SELECT id, 4, TRUE,  '09:00'::time, '17:00'::time FROM bank_records WHERE is_active = TRUE UNION ALL
+  SELECT id, 5, TRUE,  '09:00'::time, '12:00'::time FROM bank_records WHERE is_active = TRUE UNION ALL
+  SELECT id, 6, FALSE, NULL::time, NULL::time     FROM bank_records WHERE is_active = TRUE;
 
 INSERT INTO conditions_of_use (version, content, is_current) VALUES (1,
 '1. For community use only — not for commercial or profit-making purposes.

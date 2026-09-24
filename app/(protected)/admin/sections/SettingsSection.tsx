@@ -1,7 +1,8 @@
 import { getSystemSettings, getActiveBankWithHours } from "@/lib/queries/admin";
 import { updateSystemSettingsAction, updateBankAction, updateOpeningHourAction } from "@/app/actions/admin";
 
-const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+// day_of_week: 0 = Monday … 6 = Sunday (see db/schema.sql)
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 export default async function SettingsSection() {
   const [settings, bankData] = await Promise.all([
@@ -84,6 +85,28 @@ export default async function SettingsSection() {
               defaultValue={settings?.email_reply_to as string}
               className="form-input"
             />
+          </div>
+          <div>
+            <label className="form-label">Online cancel cutoff (hours before pickup)</label>
+            <input
+              type="number"
+              min={0}
+              step={1}
+              name="self_cancel_cutoff_hours"
+              defaultValue={String(settings?.self_cancel_cutoff_hours ?? 0)}
+              className="form-input"
+            />
+            <p className="text-xs text-[#5E6470] mt-1">0 = customers can change or cancel online any time before pickup.</p>
+          </div>
+          <div>
+            <label className="form-label">Cancellation notices to</label>
+            <input
+              name="admin_notify_email"
+              defaultValue={(settings?.admin_notify_email as string) ?? ""}
+              placeholder="All active admins"
+              className="form-input"
+            />
+            <p className="text-xs text-[#5E6470] mt-1">Comma-separated. Leave blank to email every active admin.</p>
           </div>
           <div className="sm:col-span-2">
             <button type="submit" className="btn-primary">Save Settings</button>

@@ -3,6 +3,15 @@ import StatusBadge from "@/components/admin/StatusBadge";
 import CancelBookingBtn from "@/components/admin/CancelBookingBtn";
 import BookingDetailSection from "./BookingDetailSection";
 import ClickableRow from "@/components/admin/ClickableRow";
+import { formatAuMobile } from "@/lib/validation/booking";
+
+export type BookingViewer = {
+  /** Admin only: cancel, change dates, resend confirmation */
+  canManage: boolean;
+  /** Licence numbers and addresses */
+  showPii: boolean;
+  basePath: string;
+};
 
 function fmtDate(d: unknown) {
   if (!d) return "-";
@@ -20,9 +29,8 @@ function fmtAUD(n: number) {
 const STATUS_OPTIONS = [
   { value: "", label: "All statuses" },
   { value: "confirmed", label: "Confirmed" },
-  { value: "in_use", label: "In Use" },
-  { value: "pending_inspection", label: "Pending Inspection" },
-  { value: "complete", label: "Complete" },
+  { value: "picked_up", label: "Picked up" },
+  { value: "returned", label: "Returned" },
   { value: "cancelled", label: "Cancelled" },
 ];
 
@@ -38,8 +46,9 @@ type Props = {
   search?: string;
   dateFrom?: string;
   dateTo?: string;
-  canCancel?: boolean;
   bookingId?: string;
+  modify?: boolean;
+  viewer: BookingViewer;
 };
 
 export default async function BookingsSection({
@@ -48,11 +57,13 @@ export default async function BookingsSection({
   search,
   dateFrom,
   dateTo,
-  canCancel = true,
   bookingId,
+  modify = false,
+  viewer,
 }: Props) {
+  const canCancel = viewer.canManage;
   if (bookingId) {
-    return <BookingDetailSection bookingId={bookingId} canCancel={canCancel} />;
+    return <BookingDetailSection bookingId={bookingId} viewer={viewer} modify={modify} />;
   }
 
   const bookings = await getBookingsList({ status, category, search, dateFrom, dateTo });
@@ -156,7 +167,7 @@ export default async function BookingsSection({
                     )}
                   </td>
                   <td className="px-4 py-3 hidden lg:table-cell text-[#5E6470]">
-                    {b.contact_phone as string}
+                    {formatAuMobile(b.contact_phone as string)}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-[#5E6470]">
                     {fmtDate(b.start_date)}
@@ -171,7 +182,7 @@ export default async function BookingsSection({
                     {b.driver_name ? (
                       <>
                         <p className="font-medium text-xs">{b.driver_name as string}</p>
-                        <p className="text-xs text-[#5E6470]">{b.driver_mobile as string}</p>
+                        <p className="text-xs text-[#5E6470]">{formatAuMobile(b.driver_mobile as string)}</p>
                       </>
                     ) : (
                       <span className="text-[#5E6470]">—</span>
@@ -185,7 +196,7 @@ export default async function BookingsSection({
                   </td>
                   {canCancel && (
                     <td className="px-4 py-3">
-                      {(b.status !== "cancelled" && b.status !== "complete") && (
+                      {(b.status === "confirmed" || b.status === "picked_up") && (
                         <CancelBookingBtn bookingId={b.id as string} />
                       )}
                     </td>

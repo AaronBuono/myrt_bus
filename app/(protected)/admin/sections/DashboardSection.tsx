@@ -1,4 +1,5 @@
-import { getDashboardStats, getRecentBookings } from "@/lib/queries/admin";
+import { getDashboardStats, getRecentBookings, getEmailProblems } from "@/lib/queries/admin";
+import { fmtDateTime } from "@/lib/time";
 import StatusBadge from "@/components/admin/StatusBadge";
 import Link from "next/link";
 import ClickableRow from "@/components/admin/ClickableRow";
@@ -16,10 +17,11 @@ function fmtAUD(n: number) {
   return new Intl.NumberFormat("en-AU", { style: "currency", currency: "AUD" }).format(n);
 }
 
-export default async function DashboardSection() {
-  const [stats, recent] = await Promise.all([
+export default async function DashboardSection({ basePath }: { basePath: string }) {
+  const [stats, recent, emailProblems] = await Promise.all([
     getDashboardStats(),
     getRecentBookings(10),
+    getEmailProblems(10),
   ]);
 
   const statCards = [
@@ -27,8 +29,8 @@ export default async function DashboardSection() {
     { label: "This Month", value: stats.bookingsThisMonth, color: "text-brand-blue" },
     { label: "Revenue This Month", value: fmtAUD(stats.revenueThisMonth), color: "text-brand-green" },
     { label: "Confirmed", value: stats.confirmed, color: "text-blue-600" },
-    { label: "Currently In Use", value: stats.currentlyInUse, color: "text-green-600" },
-    { label: "Pending Inspection", value: stats.pendingInspections, color: "text-amber-600" },
+    { label: "Bus Out Now", value: stats.currentlyOut, color: "text-amber-600" },
+    { label: "Overdue", value: stats.overdue, color: stats.overdue > 0 ? "text-red-600" : "text-[#5E6470]" },
   ];
 
   return (
@@ -42,10 +44,36 @@ export default async function DashboardSection() {
         ))}
       </div>
 
+      {emailProblems.length > 0 && (
+        <div className="card p-0 overflow-hidden border-red-200">
+          <div className="px-5 py-4 border-b border-red-200 bg-red-50">
+            <h2 className="text-base font-bold text-red-800">Emails that didn&apos;t arrive ({emailProblems.length})</h2>
+            <p className="text-sm text-red-800/80">Bounced, marked as spam, or failed to send in the last 60 days. Check the address, then resend from the booking.</p>
+          </div>
+          <ul className="divide-y divide-[#F0F1F4]">
+            {emailProblems.map((e) => (
+              <li key={e.id as string} className="px-5 py-3 text-sm flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="badge-red">{e.status as string}</span>
+                {e.booking_id ? (
+                  <Link href={`${basePath}?section=bookings&bookingId=${e.booking_id as string}`} className="font-mono font-semibold text-brand-blue hover:underline">
+                    {e.reference as string}
+                  </Link>
+                ) : (
+                  <span className="text-[#5E6470]">{e.kind as string}</span>
+                )}
+                <span>{e.to_address as string}</span>
+                <span className="text-[#5E6470]">{fmtDateTime(e.created_at)}</span>
+                {!!e.error && <span className="w-full text-xs text-red-700">{e.error as string}</span>}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <div className="card p-0 overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-[#DDE1EA]">
           <h2 className="text-base font-bold text-brand-blue">Recent Bookings</h2>
-          <Link href="/admin?section=bookings" className="text-sm text-brand-blue hover:underline font-semibold">
+          <Link href={`${basePath}?section=bookings`} className="text-sm text-brand-blue hover:underline font-semibold">
             View all →
           </Link>
         </div>
@@ -68,7 +96,7 @@ export default async function DashboardSection() {
                 </tr>
               )}
               {recent.map((b) => (
-                <ClickableRow key={b.id as string} href={`?section=bookings&bookingId=${b.id as string}`} className="hover:bg-[#F8F9FC] transition-colors">
+                <ClickableRow key={b.id as string} href={`${basePath}?section=bookings&bookingId=${b.id as string}`} className="hover:bg-[#F8F9FC] transition-colors">
                   <td className="px-4 py-3 font-mono text-xs font-semibold text-brand-blue">
                     {b.reference as string}
                   </td>

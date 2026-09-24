@@ -11,6 +11,20 @@ export interface AppUser {
   role: UserRole;
 }
 
+/** Roles that can see licence numbers and home addresses. */
+export const PII_ROLES: UserRole[] = ["admin", "lions_staff"];
+
+/** Roles that can record key pickups and returns at the counter. */
+export const COUNTER_ROLES: UserRole[] = ["admin", "waw_staff"];
+
+export function canSeePii(user: AppUser): boolean {
+  return PII_ROLES.includes(user.role);
+}
+
+export function canUseCounter(user: AppUser): boolean {
+  return COUNTER_ROLES.includes(user.role);
+}
+
 // Lazily initialised so build-time static analysis doesn't fail without env vars.
 let _authServer: ReturnType<typeof createAuthServer> | null = null;
 function getAuthServer() {

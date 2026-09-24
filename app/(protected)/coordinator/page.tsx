@@ -1,7 +1,8 @@
-import { requireRole } from "@/lib/auth";
+import { requireRole, canSeePii, canUseCounter } from "@/lib/auth";
 import Link from "next/link";
 import DashboardSection from "../admin/sections/DashboardSection";
 import BookingsSection from "../admin/sections/BookingsSection";
+import DaySection from "../admin/sections/DaySection";
 
 type SearchParams = Promise<{
   section?: string;
@@ -11,9 +12,11 @@ type SearchParams = Promise<{
   dateFrom?: string;
   dateTo?: string;
   bookingId?: string;
+  date?: string;
 }>;
 
 const TABS = [
+  { key: "day", label: "Today" },
   { key: "dashboard", label: "Dashboard" },
   { key: "bookings", label: "Bookings" },
 ] as const;
@@ -21,9 +24,10 @@ const TABS = [
 type CoordSection = (typeof TABS)[number]["key"];
 
 export default async function CoordinatorPage({ searchParams }: { searchParams: SearchParams }) {
-  await requireRole("bus_coordinator", "waw_staff", "lions_staff");
+  const user = await requireRole("bus_coordinator", "waw_staff", "lions_staff");
   const params = await searchParams;
-  const section = (params.section ?? "dashboard") as CoordSection;
+  const section = (params.section ?? (user.role === "waw_staff" ? "day" : "dashboard")) as CoordSection;
+  const showPii = canSeePii(user);
 
   return (
     <>
@@ -53,7 +57,8 @@ export default async function CoordinatorPage({ searchParams }: { searchParams: 
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        {section === "dashboard" && <DashboardSection />}
+        {section === "day" && <DaySection date={params.date} showPii={showPii} canAct={canUseCounter(user)} basePath="/coordinator" />}
+        {section === "dashboard" && <DashboardSection basePath="/coordinator" />}
         {section === "bookings" && (
           <BookingsSection
             status={params.status}
@@ -62,7 +67,7 @@ export default async function CoordinatorPage({ searchParams }: { searchParams: 
             dateFrom={params.dateFrom}
             dateTo={params.dateTo}
             bookingId={params.bookingId}
-            canCancel={false}
+            viewer={{ canManage: false, showPii, basePath: "/coordinator" }}
           />
         )}
       </div>

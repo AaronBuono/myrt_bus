@@ -1,9 +1,8 @@
 const STATUS_MAP: Record<string, { cls: string; label: string }> = {
-  confirmed:          { cls: "badge-blue",   label: "Confirmed" },
-  in_use:             { cls: "badge-green",  label: "In Use" },
-  pending_inspection: { cls: "badge-amber",  label: "Pending Inspection" },
-  complete:           { cls: "badge-green",  label: "Complete" },
-  cancelled:          { cls: "badge-red",    label: "Cancelled" },
+  confirmed: { cls: "badge-blue",  label: "Confirmed" },
+  picked_up: { cls: "badge-amber", label: "Picked up" },
+  returned:  { cls: "badge-green", label: "Returned" },
+  cancelled: { cls: "badge-red",   label: "Cancelled" },
 };
 
 export default function StatusBadge({ status }: { status: string }) {

@@ -24,7 +24,7 @@ export interface ActiveBank {
 type Row = Record<string, unknown>;
 
 export async function getHomePageData() {
-  const [zones, bank, hours] = await Promise.all([
+  const [zones, bank, hours, settings] = await Promise.all([
     sql`SELECT id, zone_name, examples, rate_per_day, display_order
         FROM pricing_zones ORDER BY display_order ASC` as Promise<Row[]>,
     sql`SELECT bank_name, street_address, phone
@@ -34,6 +34,7 @@ export async function getHomePageData() {
         JOIN bank_records br ON br.id = oh.bank_record_id
         WHERE br.is_active = TRUE
         ORDER BY oh.day_of_week ASC` as Promise<Row[]>,
+    sql`SELECT email_reply_to FROM system_settings LIMIT 1` as Promise<Row[]>,
   ]);
 
   return {
@@ -57,5 +58,6 @@ export async function getHomePageData() {
       openingTime: r.opening_time as string | null,
       closingTime: r.closing_time as string | null,
     })) as OpeningHour[],
+    contactEmail: (settings[0]?.email_reply_to as string | null) ?? null,
   };
 }
