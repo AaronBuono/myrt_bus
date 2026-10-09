@@ -19,8 +19,8 @@ export default function PublicHeader() {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-2 flex-shrink-0">
-          <Link href="/book" className="btn-cta text-xs py-1.5 px-3">Book the bus</Link>
-          <Link href="/login" className="text-xs text-[#5E6470] border border-[#DDE1EA] rounded-lg px-3 py-1.5 hover:border-brand-blue transition-colors">
+          <Link href="/book" className="btn-cta text-sm py-0 px-4 min-h-[44px] inline-flex items-center">Book the bus</Link>
+          <Link href="/login" className="text-sm text-[#5E6470] border border-[#DDE1EA] rounded-lg px-4 min-h-[44px] inline-flex items-center hover:border-brand-blue transition-colors">
             Login
           </Link>
         </nav>
@@ -49,14 +49,14 @@ export default function PublicHeader() {
         <div className="md:hidden border-t border-[#DDE1EA] bg-white px-4 py-4 flex flex-col gap-3">
           <Link
             href="/book"
-            className="btn-cta text-sm px-4 py-2.5 text-center"
+            className="btn-cta text-sm px-4 py-3 text-center"
             onClick={() => setMenuOpen(false)}
           >
             Book the bus
           </Link>
           <Link
             href="/login"
-            className="text-sm text-[#5E6470] border border-[#DDE1EA] rounded-lg text-center py-2 hover:border-brand-blue transition-colors"
+            className="text-sm text-[#5E6470] border border-[#DDE1EA] rounded-lg text-center py-3 hover:border-brand-blue transition-colors"
             onClick={() => setMenuOpen(false)}
           >
             Login

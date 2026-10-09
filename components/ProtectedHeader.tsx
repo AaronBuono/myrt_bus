@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { AppUser } from "@/lib/auth";
 import SignOutButton from "@/components/SignOutButton";
@@ -13,9 +14,7 @@ export default function ProtectedHeader({ user }: { user: AppUser }) {
   return (
     <header className="bg-white border-b border-[#DDE1EA] sticky top-0 z-50 h-14 flex items-center justify-between px-4 sm:px-6">
       <div className="flex items-center gap-2.5 min-w-0">
-        <div className="w-8 h-8 rounded-full bg-brand-blue flex items-center justify-center border-2 border-brand-gold flex-shrink-0">
-          <span className="text-brand-gold font-black text-sm">L</span>
-        </div>
+        <Image src="/logo-lions.png" alt="Myrtleford Lions Club" width={34} height={34} className="rounded-full flex-shrink-0" />
         <div className="w-px h-6 bg-[#DDE1EA] flex-shrink-0" />
         <span className="text-sm font-bold text-brand-blue hidden sm:block">Alpine Community Bus</span>
         <span className="badge-blue ml-1 hidden sm:inline-flex">{ROLE_LABELS[user.role] ?? user.role}</span>

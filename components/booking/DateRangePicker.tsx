@@ -137,7 +137,7 @@ export default function DateRangePicker({ unavailableDates, selectedDates, setSe
               <div style={{ display: "flex", alignItems: "center", color: "var(--border)", fontSize: 18 }}>→</div>
               <div>
                 <p style={{ fontSize: 12, fontWeight: 700, color: "var(--muted)", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 3 }}>Return</p>
-                <p style={{ fontSize: 16, fontWeight: 600, color: selEnd ? "var(--text)" : selStart ? "var(--gold)" : "var(--border)", fontStyle: !selEnd && selStart ? "italic" : "normal" }}>
+                <p style={{ fontSize: 16, fontWeight: 600, color: selEnd ? "var(--text)" : selStart ? "var(--amber-text)" : "var(--border)", fontStyle: !selEnd && selStart ? "italic" : "normal" }}>
                   {selEnd && lastDate ? fmtDateShort(lastDate) : selStart ? "Select return date…" : "—"}
                 </p>
               </div>
@@ -160,7 +160,7 @@ export default function DateRangePicker({ unavailableDates, selectedDates, setSe
       {/* Hint text */}
       <div style={{ textAlign: "center", marginTop: 12, minHeight: 20 }}>
         {!selStart && <p style={{ fontSize: 14, color: "var(--muted)" }}>Tap a date to set your pick-up day, then tap again for your return</p>}
-        {selStart && !selEnd && <p style={{ fontSize: 14, fontWeight: 600, color: "var(--gold)" }}>Now select your return date (tap the same day again for a one-day hire)</p>}
+        {selStart && !selEnd && <p style={{ fontSize: 14, fontWeight: 600, color: "var(--amber-text)" }}>Now select your return date (tap the same day again for a one-day hire)</p>}
       </div>
 
       {/* Legend */}

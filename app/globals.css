@@ -14,11 +14,17 @@
     --border-light: #F0F1F4;
     --navy-tint: #EEF2FF;
     --gold-light: #FEF7E6;
+    --amber-text: #8F5600; /* --gold as text fails contrast; use this for amber words */
     --font-heading: var(--font-dm-sans), "DM Sans", sans-serif;
   }
 
   body {
     @apply bg-brand-cream text-[#1A1A1A] font-sans;
+  }
+
+  /* Large type reads looser as it grows; tighten it */
+  h1, h2 {
+    letter-spacing: -0.02em;
   }
 
   /* Override browser autofill grey/yellow background */
@@ -34,13 +40,13 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-brand-blue text-white font-bold px-6 py-2.5 rounded-full text-sm hover:opacity-85 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed;
+    @apply bg-brand-blue text-white font-bold px-6 py-2.5 rounded-full text-sm hover:opacity-85 active:scale-[0.97] transition-[transform,opacity] duration-100 disabled:opacity-40 disabled:active:scale-100 disabled:cursor-not-allowed;
   }
   .btn-secondary {
-    @apply bg-transparent text-brand-blue border border-brand-blue font-semibold px-6 py-2.5 rounded-full text-sm hover:opacity-85 transition-opacity;
+    @apply bg-transparent text-brand-blue border border-brand-blue font-semibold px-6 py-2.5 rounded-full text-sm hover:opacity-85 active:scale-[0.97] transition-[transform,opacity] duration-100;
   }
   .btn-cta {
-    @apply bg-brand-amber text-white font-bold px-8 py-3 rounded-full text-base hover:opacity-85 transition-opacity shadow-lg;
+    @apply bg-[#9A5A00] text-white font-bold px-8 py-3 rounded-full text-base hover:opacity-85 active:scale-[0.97] transition-[transform,opacity] duration-100 shadow-lg;
   }
   /* Size modifier — place after btn-primary/btn-cta so padding overrides */
   .btn-lg {
@@ -91,7 +97,7 @@
     @apply border-l-4 border-brand-blue pl-3 mb-4;
   }
   .zone-btn {
-    @apply text-left px-4 py-3.5 rounded-xl border-2 border-[#DDE1EA] bg-white hover:border-brand-blue/40 transition-colors w-full;
+    @apply text-left px-4 py-3.5 rounded-xl border-2 border-[#DDE1EA] bg-white hover:border-brand-blue/40 transition-[transform,border-color] duration-100 active:scale-[0.98] w-full;
   }
   .zone-btn-active {
     @apply border-brand-blue bg-[#EEF2FF];
@@ -123,6 +129,9 @@
 .cal-day-hover:hover > span {
   background: #EEF2FF !important;
   color: var(--navy) !important;
+}
+.cal-day-hover:active > span {
+  transform: scale(0.92);
 }
 
 /* Two-month calendar: stacked on mobile, side-by-side on desktop */

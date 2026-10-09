@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Book the bus" };
 const DEFAULT_CONDITIONS = `1. For community use only — not for commercial or profit-making purposes.
 2. Maximum 12 passengers including the driver at all times.
 3. Driver must be 21 years of age or older.
-4. A standard Victorian car licence is sufficient for this vehicle.
+4. A full Australian or New Zealand car licence is sufficient for this vehicle.
 5. No smoking — prohibited by law in all vehicles.
 6. No alcohol — strictly prohibited on board at any time.
 7. Seatbelts must be worn by all passengers at all times when the vehicle is in motion.
@@ -22,7 +22,7 @@ const DEFAULT_CONDITIONS = `1. For community use only — not for commercial or 
 13. The hirer must submit fuel gauge and odometer photos via the QR code before departure and again on return.
 14. Any accident or incident during the hire period must be reported immediately via the QR incident report.
 15. The hirer accepts liability for any damage caused to the vehicle during the hire period.
-16. To change booking dates, the existing booking must be cancelled and a new booking made.
+16. To change dates or cancel, use the private link in your confirmation email.
 17. Late cancellations and policy breaches are recorded against the hirer's booking history.
 18. Lions Club of Myrtleford reserves the right to refuse future bookings based on hire history.`;
 
@@ -35,10 +35,6 @@ export default async function BookPage() {
 
   return (
     <div>
-      <div className="bg-brand-blue px-6 py-8 text-center">
-        <h1 className="text-3xl font-bold text-white mb-1">Book the bus</h1>
-        <p className="text-white/80 text-base">Choose your dates, fill in your details, and get a booking reference straight away.</p>
-      </div>
       <BookingWizard
         zones={zones}
         unavailableDates={unavailableDates}
