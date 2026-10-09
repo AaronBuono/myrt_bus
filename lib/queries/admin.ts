@@ -259,10 +259,6 @@ export async function updateZoneRate(zoneId: string, newRate: number, userId: st
   `;
 }
 
-export async function updateAdditionalDayRate(newRate: number) {
-  await sql`UPDATE system_settings SET additional_day_rate = ${newRate}, updated_at = NOW()`;
-}
-
 // ── Conditions of Use ────────────────────────────────────────
 
 export async function getConditionsHistory() {
@@ -303,7 +299,6 @@ export async function updateSystemSettings(data: {
   postalAddress?: string;
   treasurerName?: string;
   treasurerMobile?: string;
-  emailFromAddress?: string;
   emailReplyTo?: string;
   selfCancelCutoffHours?: number;
   adminNotifyEmail?: string;
@@ -318,7 +313,6 @@ export async function updateSystemSettings(data: {
       postal_address      = COALESCE(${data.postalAddress ?? null}, postal_address),
       treasurer_name      = COALESCE(${data.treasurerName ?? null}, treasurer_name),
       treasurer_mobile    = COALESCE(${data.treasurerMobile ?? null}, treasurer_mobile),
-      email_from_address  = COALESCE(${data.emailFromAddress ?? null}, email_from_address),
       email_reply_to      = ${data.emailReplyTo ?? null},
       updated_at          = NOW()
   `;

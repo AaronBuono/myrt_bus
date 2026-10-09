@@ -17,6 +17,7 @@ import {
 } from "@/lib/queries/booking";
 import { recordPickup, recordReturn, getDayView, publishNewConditions, updateZoneRate } from "@/lib/queries/admin";
 import { rateLimit } from "@/lib/rate-limit";
+import { getUserByAuthId } from "@/lib/auth";
 import { hashToken } from "@/lib/tokens";
 import { isOverlapViolation, isReferenceCollision } from "@/lib/reference";
 import { bookingSchema, type BookingData } from "@/lib/validation/booking";
@@ -196,4 +197,24 @@ test("publishing conditions and changing a rate are atomic single statements", a
   await updateZoneRate(z.id as string, 99, staff.id);
   const [h] = await sql`SELECT old_rate, new_rate FROM pricing_history WHERE zone_id = ${z.id}`;
   assert.deepEqual(h, { old_rate: z.rate_per_day, new_rate: "99.00" });
+});
+
+test("staff login links only by verified email, and never for inactive staff", async () => {
+  await sql`INSERT INTO users (display_name, email, role) VALUES ('Ann Admin', 'ann@example.com', 'admin'),
+                                                                 ('Old Staff', 'old@example.com', 'lions_staff')`;
+  await sql`UPDATE users SET is_active = FALSE WHERE email = 'old@example.com'`;
+
+  // No verified email (getUser passes none when unverified): no link.
+  assert.equal(await getUserByAuthId("auth-attacker"), null);
+  const [ann] = await sql`SELECT neon_auth_user_id FROM users WHERE email = 'ann@example.com'`;
+  assert.equal(ann.neon_auth_user_id, null);
+
+  // Verified, case-insensitive match: links once and is found by ID afterwards.
+  const linked = await getUserByAuthId("auth-ann", "ANN@example.com");
+  assert.equal(linked?.role, "admin");
+  assert.equal((await getUserByAuthId("auth-ann"))?.email, "ann@example.com");
+  // A second account with the same email can't take the record over.
+  assert.equal(await getUserByAuthId("auth-other", "ann@example.com"), null);
+
+  assert.equal(await getUserByAuthId("auth-old", "old@example.com"), null);
 });

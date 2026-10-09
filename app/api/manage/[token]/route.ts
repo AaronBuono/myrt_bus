@@ -5,7 +5,7 @@ import {
   cancelBooking,
   modifyBookingDates,
 } from "@/lib/queries/booking";
-import { periodSchema, fieldErrors } from "@/lib/validation/booking";
+import { periodSchema, fieldErrors, startsTooFarAhead } from "@/lib/validation/booking";
 import { hashToken, looksLikeToken } from "@/lib/tokens";
 import { isOverlapViolation } from "@/lib/reference";
 import { rateLimit, clientKey } from "@/lib/rate-limit";
@@ -66,6 +66,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
       const p = parsed.data;
       if (melbourneToUtc(p.startDate, p.pickupTime).getTime() <= Date.now()) {
         return NextResponse.json({ error: "Choose a pick-up time in the future." }, { status: 400 });
+      }
+      if (startsTooFarAhead(p.startDate)) {
+        return NextResponse.json({ error: "Bookings can be made up to 12 months ahead." }, { status: 400 });
       }
 
       const result = await modifyBookingDates(booking.id, p, "customer");

@@ -35,5 +35,5 @@ export default async function middleware(req: NextRequest) {
 
 export const config = {
   // Everything except static assets, so the canonical redirect covers every page.
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon.png|.*\\.(?:png|jpg|jpeg|svg|webp|ico|webmanifest)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|apple-icon.png|.*\\.(?:png|jpg|jpeg|svg|webp|ico|webmanifest)$).*)"],
 };

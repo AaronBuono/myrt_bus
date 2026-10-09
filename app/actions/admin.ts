@@ -57,8 +57,11 @@ export async function resendConfirmationAction(_prev: ActionState, formData: For
   if (!token) return { error: "Only confirmed bookings can have their confirmation resent." };
 
   await logAudit({ actor: user, entityType: "booking", entityId: id, bookingId: id, action: "confirmation_resent" });
-  await sendConfirmationFor(id, token);
+  const sent = await sendConfirmationFor(id, token);
   revalidateBookings();
+  if (!sent) {
+    return { error: "The email didn't send, and the old manage link no longer works. Check the email log, then try again." };
+  }
   return { ok: true, message: "Confirmation sent with a new manage link. Any older link no longer works." };
 }
 
@@ -124,7 +127,6 @@ export async function updateSystemSettingsAction(formData: FormData) {
     postalAddress: (formData.get("postal_address") as string) || undefined,
     treasurerName: (formData.get("treasurer_name") as string) || undefined,
     treasurerMobile: (formData.get("treasurer_mobile") as string) || undefined,
-    emailFromAddress: (formData.get("email_from_address") as string) || undefined,
     emailReplyTo: (formData.get("email_reply_to") as string) || undefined,
     selfCancelCutoffHours: isNaN(cutoff) || cutoff < 0 ? undefined : cutoff,
     adminNotifyEmail: ((formData.get("admin_notify_email") as string) || "").trim() || undefined,

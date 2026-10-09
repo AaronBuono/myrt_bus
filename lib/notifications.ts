@@ -10,12 +10,16 @@ export function manageUrl(token: string): string {
   return `${SITE_URL}/manage/${token}`;
 }
 
-export async function sendConfirmationFor(bookingId: string, token: string, opts: { isChange?: boolean } = {}) {
+/** Returns whether the email was sent. */
+export async function sendConfirmationFor(bookingId: string, token: string, opts: { isChange?: boolean } = {}): Promise<boolean> {
   try {
     const d = await getBookingEmailData(bookingId);
-    if (d) await sendBookingConfirmation(d, manageUrl(token), opts);
+    if (!d) return false;
+    await sendBookingConfirmation(d, manageUrl(token), opts);
+    return true;
   } catch (err) {
     console.error("Confirmation email failed:", err);
+    return false;
   }
 }
 

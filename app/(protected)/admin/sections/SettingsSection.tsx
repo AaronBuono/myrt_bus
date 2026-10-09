@@ -69,15 +69,6 @@ export default async function SettingsSection() {
             />
           </div>
           <div>
-            <label className="form-label">Email From Address</label>
-            <input
-              type="email"
-              name="email_from_address"
-              defaultValue={settings?.email_from_address as string}
-              className="form-input"
-            />
-          </div>
-          <div>
             <label className="form-label">Email Reply-To</label>
             <input
               type="email"

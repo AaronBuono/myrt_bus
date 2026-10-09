@@ -6,7 +6,6 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
     "test": "node --import ./tests/register.mjs --test tests/*.test.ts",
     "db:push": "export $(grep -v '^#' .env.local | xargs) && psql $DATABASE_URL -v ON_ERROR_STOP=1 -f db/schema.sql",
     "db:migrate": "export $(grep -v '^#' .env.local | xargs) && psql $DATABASE_URL -v ON_ERROR_STOP=1 -f",
@@ -29,8 +28,6 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "autoprefixer": "^10.5.0",
-    "eslint": "^9",
-    "eslint-config-next": "15.2.4",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"

@@ -47,13 +47,18 @@ export async function POST(req: NextRequest) {
   const error = event.data?.bounce?.message ?? event.data?.failed?.reason ?? null;
 
   // Events can arrive out of order; never downgrade (e.g. a late "delivered" over "bounced").
-  await sql`
-    UPDATE email_log
-    SET status = ${status}, error = COALESCE(${error}::text, error), updated_at = NOW()
-    WHERE resend_email_id = ${emailId}
-      AND (CASE ${status}::text WHEN 'sent' THEN 0 WHEN 'delivery_delayed' THEN 1 WHEN 'delivered' THEN 2 ELSE 3 END)
-       >= (CASE status        WHEN 'sent' THEN 0 WHEN 'delivery_delayed' THEN 1 WHEN 'delivered' THEN 2 ELSE 3 END)
-  `;
+  const rows = (await sql`
+    WITH u AS (
+      UPDATE email_log
+      SET status = ${status}, error = COALESCE(${error}::text, error), updated_at = NOW()
+      WHERE resend_email_id = ${emailId}
+        AND (CASE ${status}::text WHEN 'sent' THEN 0 WHEN 'delivery_delayed' THEN 1 WHEN 'delivered' THEN 2 ELSE 3 END)
+         >= (CASE status        WHEN 'sent' THEN 0 WHEN 'delivery_delayed' THEN 1 WHEN 'delivered' THEN 2 ELSE 3 END)
+    )
+    SELECT EXISTS (SELECT 1 FROM email_log WHERE resend_email_id = ${emailId}) AS known
+  `) as { known: boolean }[];
 
+  // The event can beat our email_log insert; a non-2xx makes Resend retry later.
+  if (!rows[0]?.known) return NextResponse.json({ error: "Unknown email" }, { status: 404 });
   return NextResponse.json({ ok: true });
 }
