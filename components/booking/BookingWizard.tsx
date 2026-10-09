@@ -51,11 +51,19 @@ export default function BookingWizard({ zones, unavailableDates, conditions }: P
   }, []);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   }, [step]);
 
   return (
     <div>
+      {/* Hidden on the confirmation step, which has its own h1 */}
+      {step < 3 && (
+        <div className="bg-brand-blue px-6 py-8 text-center">
+          <h1 className="text-3xl font-bold text-white mb-1">Book the bus</h1>
+          <p className="text-white/80 text-base">Choose your dates, fill in your details, and get a booking reference straight away.</p>
+        </div>
+      )}
+
       {/* Step progress */}
       <div style={{ background: "#fff", borderBottom: "1px solid var(--border)", padding: "20px 24px" }}>
         <div style={{ maxWidth: 640, margin: "0 auto", display: "flex", alignItems: "center" }}>

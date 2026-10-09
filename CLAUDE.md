@@ -152,7 +152,7 @@ Copy [`.env.local.example`](.env.local.example) to `.env.local`:
 
 ### Branding
 
-Site name "Alpine Community Bus" and URLs live in [lib/site.ts](lib/site.ts). Primary: `#002868` (dark blue), accent: `#C97B0A` (amber). Background `#F5F6F8`, borders `#DDE1EA`. Favicon/app icons are generated from [app/icon.svg](app/icon.svg) (copy in `public/logo-acb.svg`); partner logos are `public/logo-lions.png`, `public/logo-alpine.png`. Primary font is **DM Sans** (`var(--font-dm-sans)`).
+Site name "Alpine Community Bus" and URLs live in [lib/site.ts](lib/site.ts). Primary: `#002868` (dark blue), accent: `#C97B0A` (amber). Background `#F5F6F8`, borders `#DDE1EA`. Favicon/app icons (`app/favicon.ico`, `app/apple-icon.png`, `public/android-chrome-*`, `public/favicon-*`) are the Lions logo, as is `public/logo-lions.png`; the Alpine Shire logo is `public/logo-alpine.png`. Primary font is **DM Sans** (`var(--font-dm-sans)`).
 
 Home page motion uses `motion` (`import { motion } from "motion/react"`) only in the client components in [components/home/Motion.tsx](components/home/Motion.tsx); the page stays a server component, the app is wrapped in `<MotionConfig reducedMotion="user">`, and CTAs are never inside an animated wrapper that hides them.
 

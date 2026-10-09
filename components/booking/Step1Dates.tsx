@@ -67,7 +67,7 @@ export default function Step1Dates({
             )}
           </div>
           <button type="button" disabled={!canContinue} onClick={onNext} className="btn-primary btn-lg" style={{ width: "100%" }}>
-            Continue →
+            {days === 0 ? "Pick your dates" : zoneId === "" ? "Choose a destination zone" : "Continue →"}
           </button>
         </div>
       </div>

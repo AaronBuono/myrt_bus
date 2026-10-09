@@ -77,7 +77,7 @@ export function MonthGrid({
     <div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", marginBottom: 6 }}>
         {DAY_LABELS.map((d) => (
-          <div key={d} style={{ textAlign: "center", fontSize: 11, fontWeight: 700, color: "var(--muted-light)", padding: "4px 0", userSelect: "none", letterSpacing: "0.05em" }}>
+          <div key={d} style={{ textAlign: "center", fontSize: 13, fontWeight: 700, color: "var(--muted)", padding: "4px 0", userSelect: "none", letterSpacing: "0.05em" }}>
             {d}
           </div>
         ))}
@@ -121,11 +121,11 @@ export function MonthGrid({
             cursor: disabled ? "default" : "pointer",
             transition: "background 0.15s, color 0.15s",
             fontFamily: "inherit",
-            background: hasCircle ? "var(--navy)" : "transparent",
+            background: hasCircle ? "var(--navy)" : isUnavailable ? "#FEF0EE" : "transparent",
             color: hasCircle
               ? "#fff"
               : isUnavailable
-              ? "#D4C4B8"
+              ? "#86503F"
               : isPast
               ? "#CFC9C2"
               : isInRange

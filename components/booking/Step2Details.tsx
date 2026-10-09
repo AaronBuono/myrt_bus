@@ -139,7 +139,7 @@ export default function Step2Details({
   function showErrors(errs: Record<string, string>) {
     setErrors(errs);
     const first = FIELD_ORDER.find((k) => errs[k]);
-    if (first) document.getElementById(`field-${first}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (first) document.getElementById(`field-${first}`)?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -169,7 +169,7 @@ export default function Step2Details({
         if (data.code === "conditions_changed" && data.conditions) {
           setConditions(data.conditions);
           setConditionsAccepted(false);
-          document.getElementById("field-conditionsAccepted")?.scrollIntoView({ behavior: "smooth", block: "center" });
+          document.getElementById("field-conditionsAccepted")?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
         }
         if (data.code === "unavailable") setDatesTaken(true);
         return;

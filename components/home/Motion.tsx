@@ -54,12 +54,3 @@ export function StaggerItem({ children, className }: { children: React.ReactNode
     </motion.li>
   );
 }
-
-/** Wraps a CTA with a small hover/tap scale. The link inside is usable immediately. */
-export function PressScale({ children }: { children: React.ReactNode }) {
-  return (
-    <motion.span style={{ display: "inline-block" }} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-      {children}
-    </motion.span>
-  );
-}

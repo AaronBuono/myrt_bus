@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { getHomePageData } from "@/lib/queries/home";
 import { summariseHours } from "@/lib/hours";
-import { HeroReveal, StaggerList, StaggerItem, PressScale } from "@/components/home/Motion";
+import { HeroReveal, StaggerList, StaggerItem } from "@/components/home/Motion";
 import BusIllustration from "@/components/home/BusIllustration";
 import { OPERATOR_NAME } from "@/lib/site";
 
@@ -34,7 +34,7 @@ const CONDITIONS_SUMMARY = [
 function SectionHeading({ eyebrow, title, id }: { eyebrow: string; title: string; id: string }) {
   return (
     <div style={{ marginBottom: 28 }}>
-      <p style={{ fontSize: 13, fontWeight: 700, color: "var(--gold)", letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: 8 }}>{eyebrow}</p>
+      <p style={{ fontSize: 13, fontWeight: 700, color: "var(--amber-text)", letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: 8 }}>{eyebrow}</p>
       <h2 id={id} style={{ fontFamily: "var(--font-heading)", fontSize: 30, fontWeight: 700, color: "var(--text)", lineHeight: 1.2 }}>{title}</h2>
     </div>
   );
@@ -59,11 +59,9 @@ export default async function HomePage() {
               </p>
             </HeroReveal>
             {/* Outside the reveal so it's visible and clickable from the first paint */}
-            <PressScale>
-              <Link href="/book" className="btn-cta btn-lg" style={{ display: "inline-block", textDecoration: "none", fontSize: 18, padding: "16px 36px" }}>
-                Book the bus
-              </Link>
-            </PressScale>
+            <Link href="/book" className="btn-cta btn-lg" style={{ display: "inline-block", textDecoration: "none", fontSize: 18, padding: "16px 36px" }}>
+              Book the bus
+            </Link>
           </div>
           <BusIllustration className="home-hero-art" />
         </div>
