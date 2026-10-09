@@ -2,6 +2,7 @@
 // Keep this file free of server-only imports.
 
 import { z } from "zod";
+import { daysInclusive, todayInMelbourne } from "@/lib/time";
 
 // ── Licence ─────────────────────────────────────────────────
 
@@ -53,8 +54,14 @@ export function formatAuMobile(e164: string | null | undefined): string {
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const HH_MM = /^([01]\d|2[0-3]):[0-5]\d$/;
 
+// The regex alone lets "2028-06-31" through, which Postgres then rejects.
+const isRealDate = (v: string) => new Date(`${v}T00:00:00Z`).toISOString().startsWith(v);
+
 const isoDate = (label: string) =>
-  z.string({ message: `${label} is required` }).regex(ISO_DATE, `${label} is required`);
+  z
+    .string({ message: `${label} is required` })
+    .regex(ISO_DATE, `${label} is required`)
+    .refine(isRealDate, `${label} isn't a real date`);
 
 const time = (label: string) =>
   z.string({ message: `${label} is required` }).regex(HH_MM, `${label} is required`);
@@ -87,11 +94,21 @@ const periodFields = {
 
 type Period = { startDate: string; endDate: string; pickupTime: string; returnTime: string };
 
+export const MAX_HIRE_DAYS = 14;
+
+/** Public bookings and changes only (checked in the API routes, like "pick-up is in the past"). */
+export function startsTooFarAhead(startDate: string, now = new Date()): boolean {
+  return daysInclusive(todayInMelbourne(now), startDate) > 366;
+}
+
 function checkPeriod(d: Period, ctx: z.RefinementCtx) {
+  if (!ISO_DATE.test(d.startDate) || !ISO_DATE.test(d.endDate)) return; // field errors already reported
   if (d.endDate < d.startDate) {
     ctx.addIssue({ code: "custom", path: ["endDate"], message: "Return date must be on or after the pick-up date" });
   } else if (d.endDate === d.startDate && d.returnTime <= d.pickupTime) {
     ctx.addIssue({ code: "custom", path: ["returnTime"], message: "Return time must be after the pick-up time" });
+  } else if (daysInclusive(d.startDate, d.endDate) > MAX_HIRE_DAYS) {
+    ctx.addIssue({ code: "custom", path: ["endDate"], message: `The bus can be hired for up to ${MAX_HIRE_DAYS} days at a time` });
   }
 }
 

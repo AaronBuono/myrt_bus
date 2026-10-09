@@ -8,6 +8,8 @@ import {
   normaliseLicenceNumber,
   formatAuMobile,
   fieldErrors,
+  startsTooFarAhead,
+  MAX_HIRE_DAYS,
   type BookingInput,
 } from "@/lib/validation/booking";
 import { generateReference, REFERENCE_ALPHABET } from "@/lib/reference";
@@ -120,6 +122,23 @@ test("same-day hire must return after pickup", () => {
   assert.ok(!r.success);
   assert.ok(fieldErrors(r.error).returnTime);
   assert.ok(!periodSchema.safeParse({ startDate: "2030-03-02", endDate: "2030-03-01", pickupTime: "09:00", returnTime: "17:00" }).success);
+});
+
+test("impossible dates are rejected, not passed to Postgres", () => {
+  const r = bookingSchema.safeParse({ ...valid, licenceExpiry: "2033-02-31" });
+  assert.ok(!r.success);
+  assert.ok(fieldErrors(r.error).licenceExpiry);
+  assert.ok(!periodSchema.safeParse({ startDate: "2030-06-31", endDate: "2030-07-01", pickupTime: "09:00", returnTime: "17:00" }).success);
+});
+
+test("hire length and lead time are capped", () => {
+  const p = (endDate: string) => periodSchema.safeParse({ startDate: "2030-03-01", endDate, pickupTime: "09:00", returnTime: "17:00" });
+  assert.ok(p(`2030-03-${MAX_HIRE_DAYS}`).success);
+  const tooLong = p(`2030-03-${MAX_HIRE_DAYS + 1}`);
+  assert.ok(!tooLong.success && fieldErrors(tooLong.error).endDate);
+  const now = new Date("2026-10-09T00:00:00Z");
+  assert.equal(startsTooFarAhead("2027-10-09", now), false);
+  assert.equal(startsTooFarAhead("2027-10-11", now), true);
 });
 
 // ── References ──────────────────────────────────────────────

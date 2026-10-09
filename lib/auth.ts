@@ -1,6 +1,6 @@
 import { createAuthServer } from "@neondatabase/auth/next/server";
 import { redirect } from "next/navigation";
-import { sql } from "./db";
+import { sql } from "@/lib/db";
 
 export type UserRole = "admin" | "lions_staff" | "bus_coordinator" | "waw_staff";
 
@@ -39,7 +39,8 @@ function getAuthServer() {
 export async function getUser(): Promise<AppUser | null> {
   const { data: session } = await getAuthServer().getSession();
   if (!session?.user?.id) return null;
-  return getUserByAuthId(session.user.id, session.user.email ?? undefined);
+  // Unverified emails must not auto-link: anyone can sign up claiming a staff address.
+  return getUserByAuthId(session.user.id, session.user.emailVerified ? session.user.email : undefined);
 }
 
 /**
@@ -86,9 +87,10 @@ export async function sendNeonAuthPasswordReset(email: string, appUrl: string): 
 
 /**
  * Looks up the app user record by their Neon Auth user ID.
- * If not found by ID but email is provided, auto-links an unlinked staff record with a matching email.
+ * If not found by ID, auto-links an unlinked staff record with a matching email.
+ * Only pass an email the auth provider has verified.
  */
-export async function getUserByAuthId(authId: string, email?: string): Promise<AppUser | null> {
+export async function getUserByAuthId(authId: string, verifiedEmail?: string): Promise<AppUser | null> {
   const rows = (await sql`
     SELECT id, display_name, email, role
     FROM users
@@ -103,12 +105,12 @@ export async function getUserByAuthId(authId: string, email?: string): Promise<A
   }
 
   // Auto-link: if the admin pre-created a staff record with this email but no auth ID yet
-  if (email) {
+  if (verifiedEmail) {
     await sql`
       UPDATE users
       SET neon_auth_user_id = ${authId}
       WHERE neon_auth_user_id IS NULL
-        AND LOWER(email) = LOWER(${email})
+        AND LOWER(email) = LOWER(${verifiedEmail})
         AND is_active = TRUE
     `;
     const linked = (await sql`

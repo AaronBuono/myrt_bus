@@ -2,6 +2,7 @@
 //   "@/…"          → project root (tries .ts, .tsx, /index.ts)
 //   "server-only"  → empty module
 //   "@/lib/db"     → in-memory Postgres (tests/pglite-db.ts) instead of Neon
+//   "next/<subpath>" → next/<subpath>.js (Next has no ESM exports map)
 import { statSync } from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import path from "node:path";
@@ -19,6 +20,7 @@ function withExt(p) {
 
 export async function resolve(specifier, context, next) {
   if (specifier === "server-only") return { url: "data:text/javascript,export {}", shortCircuit: true };
+  if (/^next\/[a-z-]+$/.test(specifier)) return next(`${specifier}.js`, context);
   if (specifier === "@/lib/db") return { url: pathToFileURL(path.join(root, "tests/pglite-db.ts")).href, shortCircuit: true };
   if (specifier.startsWith("@/")) {
     const file = withExt(path.join(root, specifier.slice(2)));

@@ -53,6 +53,7 @@ interface Props {
 }
 
 const FIELD_ORDER = [
+  "endDate",
   "organisation", "contactName", "contactMobile", "contactEmail", "contactAddress",
   "driverName", "driverMobile", "licenceState", "licenceNumber", "licenceExpiry", "driverAddress", "ageConfirmed",
   "pickupTime", "returnTime", "destination", "conditionsAccepted",

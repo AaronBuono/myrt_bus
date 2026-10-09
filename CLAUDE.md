@@ -21,7 +21,7 @@ npm run db:migrate -- db/migrations/001_v2_booking_overhaul.sql   # Apply one mi
 npm run db:seed    # Load test data (refuses to run on a database with real bookings)
 ```
 
-`npm run lint` is broken: Next 16 removed `next lint` and there's no ESLint config yet.
+There is no linter; `npm run build` type-checks.
 
 Tests import app code through [tests/loader.mjs](tests/loader.mjs), which maps `@/…`, stubs `server-only`, and swaps `@/lib/db` for [tests/pglite-db.ts](tests/pglite-db.ts). `tests/` is excluded from `tsconfig.json`.
 

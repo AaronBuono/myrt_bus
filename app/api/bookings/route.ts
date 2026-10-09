@@ -5,7 +5,7 @@ import {
   getCurrentConditions,
   createBooking,
 } from "@/lib/queries/booking";
-import { bookingSchema, fieldErrors } from "@/lib/validation/booking";
+import { bookingSchema, fieldErrors, startsTooFarAhead } from "@/lib/validation/booking";
 import { isOverlapViolation } from "@/lib/reference";
 import { rateLimit, clientKey } from "@/lib/rate-limit";
 import { melbourneToUtc } from "@/lib/time";
@@ -40,6 +40,10 @@ export async function POST(req: NextRequest) {
       { error: "The pick-up time has already passed.", fieldErrors: { pickupTime: "Choose a pick-up time in the future" } },
       { status: 400 },
     );
+  }
+
+  if (startsTooFarAhead(d.startDate)) {
+    return NextResponse.json({ error: "Bookings can be made up to 12 months ahead." }, { status: 400 });
   }
 
   try {
