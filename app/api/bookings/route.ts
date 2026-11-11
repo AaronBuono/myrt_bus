@@ -10,8 +10,12 @@ import { isOverlapViolation } from "@/lib/reference";
 import { rateLimit, clientKey } from "@/lib/rate-limit";
 import { melbourneToUtc } from "@/lib/time";
 import { sendConfirmationFor } from "@/lib/notifications";
+import { BOOKINGS_OPEN } from "@/lib/site";
 
 export async function POST(req: NextRequest) {
+  if (!BOOKINGS_OPEN) {
+    return NextResponse.json({ error: "Online booking isn't open yet." }, { status: 503 });
+  }
   if (!(await rateLimit(`booking:${clientKey(req.headers)}`, 5, 600))) {
     return NextResponse.json(
       { error: "Too many booking attempts. Please wait a few minutes and try again." },
