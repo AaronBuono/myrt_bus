@@ -14,7 +14,9 @@ function getResend(): Resend {
 }
 
 function fromAddress(): string {
-  return process.env.EMAIL_FROM ?? `${SITE_NAME} <noreply@alpinecommunitybus.com.au>`;
+  // The Vercel dashboard keeps quotes and whitespace pasted from .env files; Resend rejects them.
+  const from = process.env.EMAIL_FROM?.trim().replace(/^(["'])(.*)\1$/, "$2").trim();
+  return from || `${SITE_NAME} <noreply@alpinecommunitybus.com.au>`;
 }
 
 export type EmailKind = "booking_confirmation" | "booking_cancelled" | "admin_cancel_notice" | "staff_invite";

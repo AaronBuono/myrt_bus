@@ -10,3 +10,6 @@ export const SITE_DESCRIPTION =
   "Book the Alpine Community Bus, a 12-seater available to community groups and residents across the Alpine Shire.";
 
 export const OPERATOR_NAME = "Lions Club of Myrtleford";
+
+/** Server-side only. Online booking is closed unless BOOKINGS_OPEN=true (set per Vercel environment). */
+export const BOOKINGS_OPEN = process.env.BOOKINGS_OPEN === "true";

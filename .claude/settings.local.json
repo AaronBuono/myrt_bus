@@ -44,7 +44,9 @@
       "Bash(/Users/aaronjacobbuono/projects/myrt_bus/node_modules/.bin/next lint *)",
       "Bash(./node_modules/.bin/next lint *)",
       "Bash(./node_modules/.bin/tsc --noEmit)",
-      "Bash(sips -g pixelWidth -g pixelHeight /Users/aaronjacobbuono/projects/myrt_bus/public/logo-alpine.png)"
+      "Bash(sips -g pixelWidth -g pixelHeight /Users/aaronjacobbuono/projects/myrt_bus/public/logo-alpine.png)",
+      "Bash(textutil -convert txt -stdout /Users/aaronjacobbuono/projects/myrt_bus/bus-portal-requirements-final.docx)",
+      "WebFetch(domain:better-auth.com)"
     ]
   }
 }
